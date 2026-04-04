@@ -331,19 +331,35 @@ export default function AssistantPage() {
         body: JSON.stringify({
           formImage: uploadedFormImageRef.current || undefined,
           filledFields: fields,
-          title: "PM-KISAN Application — FormSaathi",
+          title: "Application Form — FormSaathi",
         }),
       });
       if (!res.ok) throw new Error("PDF generation failed");
       const data = await res.json();
       downloadPdf(data.pdf, data.filename);
+
+      // Build warning message for incomplete forms
+      let warningText = "";
+      if (data.emptyFields && data.emptyFields.length > 0) {
+        const missing = (data.emptyFields as string[]).join(", ");
+        warningText = `\n\n⚠️ ${data.fieldsFilled}/${data.totalFields} fields filled. Missing: ${missing}`;
+      }
+
       msgCounter.current += 1;
       setUiMessages((prev) => [...prev, {
-        id: `msg-${msgCounter.current}`, role: "assistant" as const, text: "",
-        pdfDownload: { base64: data.pdf, filename: data.filename }, timestamp: Date.now(),
+        id: `msg-${msgCounter.current}`, role: "assistant" as const,
+        text: data.isComplete
+          ? `✅ All ${data.totalFields} fields filled successfully!`
+          : `⚠️ ${data.fieldsFilled}/${data.totalFields} fields filled.${warningText}`,
+        pdfDownload: { base64: data.pdf, filename: data.filename },
+        timestamp: Date.now(),
       }]);
-      setPhase("complete");
-      phaseRef.current = "complete";
+
+      if (data.isComplete) {
+        setPhase("complete");
+        phaseRef.current = "complete";
+      }
+      // Don't set complete if incomplete — keep the download bar visible
     } catch {
       setError("PDF generation failed");
     }
@@ -779,8 +795,8 @@ export default function AssistantPage() {
         <div ref={chatEndRef} />
       </div>
 
-      {/* Quick PDF download bar — shows when form fields are filled */}
-      {filledFormFields && phase === "offline-fill" && (
+      {/* Quick PDF download bar — shows whenever form fields exist (any stage) */}
+      {filledFormFields && (phase === "offline-scan" || phase === "offline-fill" || phase === "offline-generate") && (
         <div className="border-t border-saathi-forest/20 bg-saathi-mint/20 px-4 py-3 flex items-center gap-3">
           <div className="flex-1">
             <p className="text-sm font-semibold text-saathi-forest">

@@ -92,6 +92,12 @@ export async function POST(request: NextRequest) {
         if (acroFields.length > 0) {
           // This PDF has AcroForm fields — fill them directly!
           let filled = 0;
+          const filledNames: string[] = [];
+          const emptyNames: string[] = [];
+
+          // Track all form field names
+          const allFieldNames = acroFields.map((f) => f.getName());
+
           for (const [label, value] of Object.entries(body.filledFields)) {
             if (!value || value === "this" || value === "True") continue;
             const fieldName = matchToFormField(label);
@@ -100,19 +106,32 @@ export async function POST(request: NextRequest) {
               const field = formObj.getTextField(fieldName);
               field.setText(value);
               filled++;
+              filledNames.push(fieldName);
             } catch {
               // Field might not exist or not be a text field
             }
           }
+
+          // Find unfilled fields
+          for (const name of allFieldNames) {
+            if (!filledNames.includes(name)) {
+              emptyNames.push(name);
+            }
+          }
+
+          const isComplete = emptyNames.length === 0;
 
           // Flatten so fields show as printed text
           formObj.flatten();
           const pdfBytes = await srcDoc.save();
           return NextResponse.json({
             pdf: Buffer.from(pdfBytes).toString("base64"),
-            filename: `formsaathi-filled-${Date.now()}.pdf`,
+            filename: `formsaathi-${isComplete ? "complete" : "incomplete"}-${Date.now()}.pdf`,
             method: "acroform",
             fieldsFilled: filled,
+            totalFields: allFieldNames.length,
+            emptyFields: emptyNames,
+            isComplete,
           });
         }
       } catch {
