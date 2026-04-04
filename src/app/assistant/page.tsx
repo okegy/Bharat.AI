@@ -31,6 +31,7 @@ interface UIMessage {
   imageUrl?: string;
   portalUrl?: string;
   pdfDownload?: { base64: string; filename: string };
+  formDownload?: { name: string; nameHi: string; path: string };
   showUploadCard?: boolean;
   toolsUsed?: string[];
   timestamp: number;
@@ -292,6 +293,23 @@ export default function AssistantPage() {
           Object.entries(profileRef.current).filter(([, v]) => v),
         ) as Record<string, string>;
         generateAndDownloadPdf({ ...profileClean, ...fields });
+        break;
+      }
+      case "download_form": {
+        const formName = action.formName as string;
+        const formNameHi = action.formNameHi as string;
+        const formPath = action.downloadPath as string;
+        msgCounter.current += 1;
+        setUiMessages((prev) => [
+          ...prev,
+          {
+            id: `msg-${msgCounter.current}`,
+            role: "assistant",
+            text: "",
+            formDownload: { name: formName, nameHi: formNameHi, path: formPath },
+            timestamp: Date.now(),
+          },
+        ]);
         break;
       }
       case "navigate": {
@@ -733,6 +751,24 @@ export default function AssistantPage() {
                 </a>
               )}
               {msg.text && <p className="whitespace-pre-wrap">{msg.text}</p>}
+              {msg.formDownload && (
+                <a
+                  href={msg.formDownload.path}
+                  download
+                  className="mb-2 flex items-center gap-3 rounded-xl border-2 border-saathi-forest/20 bg-white p-4 shadow-sm hover:border-saathi-forest hover:shadow-md transition"
+                >
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-saathi-ink truncate">{msg.formDownload.nameHi}</p>
+                    <p className="text-xs text-saathi-ink/60 truncate">{msg.formDownload.name}</p>
+                    <p className="text-[10px] text-saathi-forest font-medium mt-0.5">PDF — {t("common.download", { defaultValue: "Download" })} ↓</p>
+                  </div>
+                </a>
+              )}
               {msg.pdfDownload && (
                 <a
                   href={`data:application/pdf;base64,${msg.pdfDownload.base64}`}

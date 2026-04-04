@@ -265,6 +265,14 @@ export async function POST(request: NextRequest) {
                   prompt: action.prompt,
                 };
                 break;
+              case "download_form":
+                nextAction = {
+                  type: "download_form",
+                  formName: action.formName,
+                  formNameHi: action.formNameHi,
+                  downloadPath: action.downloadPath,
+                };
+                break;
             }
           }
 

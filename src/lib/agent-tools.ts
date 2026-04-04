@@ -840,6 +840,73 @@ const requestVoiceInput: AgentTool = {
 
 // ─── Tool Registry ──────────────────────────────────────
 
+// ─── Tool: get_application_form ─────────────────────────
+
+const AVAILABLE_FORMS: Array<{
+  id: string;
+  name: string;
+  nameHi: string;
+  keywords: string[];
+  path: string;
+}> = [
+  { id: "pm-kisan", name: "PM-KISAN Application", nameHi: "पीएम-किसान आवेदन पत्र", keywords: ["kisan", "pm-kisan", "pm kisan", "किसान", "farmer"], path: "/forms/01-PM-KISAN-Application.pdf" },
+  { id: "ration-card", name: "Ration Card (NFSA)", nameHi: "राशन कार्ड आवेदन पत्र", keywords: ["ration", "nfsa", "राशन", "food"], path: "/forms/02-Ration-Card-NFSA.pdf" },
+  { id: "pmay-urban", name: "PM Awas Yojana (Urban)", nameHi: "पीएम आवास योजना (शहरी)", keywords: ["awas", "housing", "urban", "आवास", "शहरी", "pmay"], path: "/forms/03-PM-Awas-Yojana-Urban.pdf" },
+  { id: "pmay-rural", name: "PM Awas Yojana (Rural)", nameHi: "पीएम आवास योजना (ग्रामीण)", keywords: ["awas", "housing", "rural", "gramin", "आवास", "ग्रामीण", "pmay"], path: "/forms/04-PM-Awas-Yojana-Rural.pdf" },
+  { id: "sukanya", name: "Sukanya Samriddhi Yojana", nameHi: "सुकन्या समृद्धि योजना", keywords: ["sukanya", "samriddhi", "girl", "सुकन्या", "बालिका"], path: "/forms/05-Sukanya-Samriddhi.pdf" },
+  { id: "fasal-bima", name: "PM Fasal Bima Yojana", nameHi: "पीएम फसल बीमा योजना", keywords: ["fasal", "bima", "crop", "insurance", "फसल", "बीमा"], path: "/forms/06-PM-Fasal-Bima.pdf" },
+  { id: "ayushman", name: "Ayushman Bharat (PMJAY)", nameHi: "आयुष्मान भारत योजना", keywords: ["ayushman", "bharat", "pmjay", "health", "आयुष्मान", "स्वास्थ्य"], path: "/forms/07-Ayushman-Bharat.pdf" },
+  { id: "ujjwala", name: "PM Ujjwala Yojana", nameHi: "पीएम उज्ज्वला योजना", keywords: ["ujjwala", "gas", "cylinder", "lpg", "उज्ज्वला", "गैस"], path: "/forms/08-PM-Ujjwala.pdf" },
+  { id: "nps", name: "National Pension Scheme", nameHi: "राष्ट्रीय पेंशन योजना", keywords: ["pension", "nps", "retirement", "पेंशन", "निवृत्ति"], path: "/forms/09-National-Pension.pdf" },
+  { id: "mudra", name: "PM Mudra Yojana", nameHi: "पीएम मुद्रा योजना", keywords: ["mudra", "loan", "business", "मुद्रा", "ऋण", "व्यापार"], path: "/forms/10-PM-Mudra-Yojana.pdf" },
+];
+
+const getApplicationForm: AgentTool = {
+  definition: {
+    type: "function",
+    function: {
+      name: "get_application_form",
+      description:
+        "Search for and provide a downloadable government application form. Use when the user asks for a specific scheme's form, wants to download a form, or needs a blank form to fill. Returns a download link the user can click.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "The scheme name or keywords to search for (e.g., 'PM Kisan', 'ration card', 'आवास योजना', 'pension')",
+          },
+        },
+        required: ["query"],
+      },
+    },
+  },
+  execute: async (args) => {
+    const query = ((args.query as string) || "").toLowerCase();
+    // Find matching form by keywords
+    const match = AVAILABLE_FORMS.find((f) =>
+      f.keywords.some((kw) => query.includes(kw)) ||
+      f.name.toLowerCase().includes(query) ||
+      f.id.includes(query)
+    );
+    if (match) {
+      return {
+        found: true,
+        formName: match.name,
+        formNameHi: match.nameHi,
+        downloadPath: match.path,
+        clientAction: "download_form",
+        message: `${match.name} form is ready for download.`,
+      };
+    }
+    // Return all available forms if no match
+    return {
+      found: false,
+      availableForms: AVAILABLE_FORMS.map((f) => ({ name: f.name, nameHi: f.nameHi, id: f.id })),
+      message: "Form not found. Here are the available forms.",
+    };
+  },
+};
+
 const TOOLS: AgentTool[] = [
   getUserProfile,
   updateUserProfile,
@@ -853,6 +920,7 @@ const TOOLS: AgentTool[] = [
   generateFilledPdf,
   analyzeScreenshot,
   generateGuidance,
+  getApplicationForm,
   requestCamera,
   requestScreenShare,
   openPortal,
