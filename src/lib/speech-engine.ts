@@ -213,10 +213,6 @@ function browserSpeak(
     return;
   }
 
-  // Cancel is already called by stopSpeaking() in speak(). Do NOT cancel again
-  // here — Brave/Chrome silently drop utterances if cancel() + speak() happen
-  // in the same tick. Instead, defer the speak to the next microtask.
-
   const run = () => {
     const utt = new SpeechSynthesisUtterance(text);
     utt.lang = bcp;

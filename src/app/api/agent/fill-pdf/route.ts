@@ -114,6 +114,20 @@ export async function POST(request: NextRequest) {
     });
     y -= 20;
 
+    const HAS_NON_LATIN = /[^\u0000-\u007F]/;
+
+    /** Strip non-Latin characters from text so Helvetica can render it. */
+    function latinSafe(text: string): string {
+      // Try to extract English portion from bilingual labels like "आवेदक का नाम / Applicant Name"
+      if (text.includes("/")) {
+        const parts = text.split("/");
+        const englishPart = parts.find((p) => !HAS_NON_LATIN.test(p.trim()));
+        if (englishPart) return englishPart.trim();
+      }
+      // Fall back to stripping non-Latin chars
+      return text.replace(/[^\u0000-\u007F]/g, "").replace(/\s+/g, " ").trim() || "Field";
+    }
+
     const entries = Object.entries(body.filledFields).filter(
       ([, v]) => v && v !== "this" && v !== "True",
     );
@@ -124,8 +138,9 @@ export async function POST(request: NextRequest) {
         y = summaryPage.getSize().height - 50;
       }
 
-      // Label
-      summaryPage.drawText(label, {
+      // Label — use Latin-safe version
+      const safeLabel = latinSafe(label);
+      summaryPage.drawText(safeLabel + ":", {
         x: 50,
         y,
         size: 10,
@@ -133,14 +148,17 @@ export async function POST(request: NextRequest) {
         color: rgb(0.2, 0.2, 0.2),
       });
 
-      // Value — right-aligned or on same line
-      summaryPage.drawText(value, {
-        x: 280,
-        y,
-        size: 11,
-        font,
-        color: rgb(0, 0.15, 0.4),
-      });
+      // Value — also make Latin-safe
+      const safeValue = HAS_NON_LATIN.test(value) ? latinSafe(value) || value.replace(/[^\u0000-\u007F]/g, "") : value;
+      if (safeValue) {
+        summaryPage.drawText(safeValue, {
+          x: 280,
+          y,
+          size: 11,
+          font,
+          color: rgb(0, 0.15, 0.4),
+        });
+      }
 
       y -= 22;
     }
