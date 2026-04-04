@@ -52,6 +52,7 @@ export default function AssistantPage() {
   const [phase, setPhase] = useState<AgentPhase>("greeting");
   const [error, setError] = useState("");
   const [filledFormFields, setFilledFormFields] = useState<Record<string, string> | null>(null);
+  const uploadedFormImageRef = useRef<string>("");
 
   // Screen sharing
   const [screenShareActive, setScreenShareActive] = useState(false);
@@ -284,6 +285,15 @@ export default function AssistantPage() {
       case "generate_pdf":
         generatePdfFromAction(action);
         break;
+      case "generate_pdf_client": {
+        // Agent told us to generate PDF — we have the form image locally
+        const fields = (action.filledFields ?? {}) as Record<string, string>;
+        const profileClean = Object.fromEntries(
+          Object.entries(profileRef.current).filter(([, v]) => v),
+        ) as Record<string, string>;
+        generateAndDownloadPdf({ ...profileClean, ...fields });
+        break;
+      }
       case "navigate": {
         const url = action.url as string;
         // Add a clickable portal link + screen share button in chat
@@ -310,6 +320,32 @@ export default function AssistantPage() {
         }
         break;
       }
+    }
+  }
+
+  async function generateAndDownloadPdf(fields: Record<string, string>) {
+    try {
+      const res = await fetch("/api/agent/fill-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          formImage: uploadedFormImageRef.current || undefined,
+          filledFields: fields,
+          title: "PM-KISAN Application — FormSaathi",
+        }),
+      });
+      if (!res.ok) throw new Error("PDF generation failed");
+      const data = await res.json();
+      downloadPdf(data.pdf, data.filename);
+      msgCounter.current += 1;
+      setUiMessages((prev) => [...prev, {
+        id: `msg-${msgCounter.current}`, role: "assistant" as const, text: "",
+        pdfDownload: { base64: data.pdf, filename: data.filename }, timestamp: Date.now(),
+      }]);
+      setPhase("complete");
+      phaseRef.current = "complete";
+    } catch {
+      setError("PDF generation failed");
     }
   }
 
@@ -582,6 +618,7 @@ export default function AssistantPage() {
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
+      uploadedFormImageRef.current = dataUrl;
       setPhase("offline-scan");
       phaseRef.current = "offline-scan";
       // Show the uploaded file in chat — only render as image if it's actually an image
@@ -757,10 +794,16 @@ export default function AssistantPage() {
             type="button"
             onClick={async () => {
               try {
+                // Merge profile data with agent-filled fields for maximum coverage
+                const mergedFields = { ...profileRef.current, ...filledFormFields };
                 const res = await fetch("/api/agent/fill-pdf", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ filledFields: filledFormFields, title: "Form Summary — FormSaathi" }),
+                  body: JSON.stringify({
+                    formImage: uploadedFormImageRef.current || undefined,
+                    filledFields: mergedFields,
+                    title: "PM-KISAN Application — FormSaathi",
+                  }),
                 });
                 if (!res.ok) throw new Error("Failed");
                 const data = await res.json();

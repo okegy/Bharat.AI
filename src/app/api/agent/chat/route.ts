@@ -269,33 +269,22 @@ export async function POST(request: NextRequest) {
           }
 
           // Generate PDF server-side immediately and return as download
+          // When agent calls generate_filled_pdf, tell client to generate
+          // (client has the form image, we don't)
           if (
             toolName === "generate_filled_pdf" &&
             result &&
             typeof result === "object" &&
             "action" in result
           ) {
-            try {
-              const pdfResult = result as Record<string, unknown>;
-              const filledFields = (pdfResult.filledFields ?? {}) as Record<string, string>;
-              // Import and generate summary PDF directly
-              const { generateSummaryPdf } = await import("@/lib/pdf-generator");
-              const pdfBase64 = await generateSummaryPdf(
-                filledFields,
-                "PM-KISAN Application — FormSaathi",
-              );
-              nextAction = {
-                type: "download_pdf",
-                base64: pdfBase64,
-                filename: `formsaathi-filled-${Date.now()}.pdf`,
-              };
-            } catch (pdfErr) {
-              console.error("[agent/chat] PDF generation failed:", pdfErr);
-              nextAction = {
-                type: "generate_pdf",
-                ...(result as Record<string, unknown>),
-              };
-            }
+            const pdfResult = result as Record<string, unknown>;
+            const agentFields = (pdfResult.filledFields ?? {}) as Record<string, string>;
+            // Merge profile + agent fields for maximum coverage
+            const mergedFields = { ...profileSnapshot, ...agentFields };
+            nextAction = {
+              type: "generate_pdf_client",
+              filledFields: mergedFields,
+            };
           }
 
           messages.push({
