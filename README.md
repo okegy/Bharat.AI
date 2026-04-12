@@ -6,6 +6,16 @@ FormSaathi is a voice-first AI assistant that helps Indian citizens navigate gov
 
 Built for people who find government paperwork intimidating. You speak, FormSaathi listens, fills, and guides.
 
+<p align="center">
+  <a href="https://form-saathi-one.vercel.app">
+    <img src="docs/landing.png" alt="FormSaathi Landing Page" width="800" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://form-saathi-one.vercel.app"><strong>Try it live</strong></a>
+</p>
+
 ---
 
 ## The Problem
@@ -112,20 +122,6 @@ Client (React)                     Server (Next.js API Routes)
 | `request_screen_share` | Prompt screen sharing |
 | `request_voice_input` | Ask user to speak |
 
-## Onboarding Flow
-
-```
-Language Selection (13 languages)
-       |
-  Biometrics (optional, auto-skipped if unavailable)
-       |
-  Aadhaar Scan (front + back, optional)
-       |
-  3 Voice Questions (occupation, income, category)
-       |
-  FormSaathi Assistant (the main app)
-```
-
 ## Privacy
 
 - All personal data is encrypted with AES-GCM and stored only in your browser's IndexedDB
@@ -153,12 +149,6 @@ Create `.env.local`:
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 CLERK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/onboarding
-NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/onboarding
-NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/onboarding
-NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/onboarding
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
