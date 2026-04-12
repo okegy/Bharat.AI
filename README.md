@@ -1,10 +1,10 @@
 # FormSaathi
 
-**Government forms, in your language.**
+**Government forms, in your language. Powered by an AI agent.**
 
-FormSaathi is a voice-first AI assistant that helps Indian citizens navigate government schemes, fill offline forms, and get guided help through online applications — all in their preferred language.
+FormSaathi is an **agentic AI assistant** with **15 autonomous tools** that helps Indian citizens navigate government schemes, fill offline forms, and get guided help through online applications — all by voice, in their preferred language.
 
-Built for people who find government paperwork intimidating. You speak, FormSaathi listens, fills, and guides.
+Built on **OpenRouter** with **agentic engineering** principles: the AI doesn't just answer questions — it reasons, plans, and takes actions using a server-side tool-calling loop.
 
 <p align="center">
   <a href="https://form-saathi-one.vercel.app">
@@ -18,6 +18,20 @@ Built for people who find government paperwork intimidating. You speak, FormSaat
 
 ---
 
+## Why Agentic?
+
+This isn't a chatbot with a prompt. FormSaathi runs a **server-side agentic loop** where the AI:
+
+1. Receives a user message (text or voice)
+2. Reasons about what tools to call
+3. Executes tools autonomously (scan documents, query schemes, fill PDFs, guide through websites)
+4. Returns results and decides if more actions are needed
+5. Loops until the task is complete
+
+The agent has **15 tools** it can call in any combination, any order, without human intervention. One user message can trigger 5+ tool calls behind the scenes.
+
+---
+
 ## The Problem
 
 Millions of Indians are eligible for government welfare schemes but never apply because:
@@ -28,38 +42,59 @@ Millions of Indians are eligible for government welfare schemes but never apply 
 
 ## What FormSaathi Does
 
-**One assistant that handles the entire journey — by voice.**
-
 ### 1. Speak Your Language
-Pick from 13 Indian languages. Everything changes — the UI, the voice, the forms. Supported languages: English, Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Kannada, Malayalam, Punjabi, Odia, Assamese, and Urdu.
+Pick from 13 Indian languages. Everything changes — the UI, the voice, the forms.
 
 ### 2. Scan Your Aadhaar
-Point your camera at your Aadhaar card (front and back). AI reads it and pulls out your name, father's name, DOB, gender, address, Aadhaar number — all encrypted and stored only on your device.
+The agent uses **vision tools** to OCR your Aadhaar card — extracting name, DOB, gender, address, Aadhaar number. All encrypted on-device.
 
-### 3. Answer 3 Questions
-The assistant asks what Aadhaar can't tell us: your occupation, income bracket, and social category. That's it. Everything else comes from the scan.
+### 3. Find Your Schemes
+The agent **autonomously matches** your profile against 50+ central government schemes and tells you what you qualify for.
 
-### 4. Find Your Schemes
-Based on your profile, FormSaathi matches you against 50+ central government schemes — PM-KISAN, ration cards, crop insurance, pensions, scholarships, housing, and more. It tells you what you qualify for and how much you could receive.
-
-### 5. Fill Offline Forms
-Upload or scan a physical government form. The AI:
-- Detects the form language (works with Hindi, English, Bengali, Tamil, and more)
+### 4. Fill Offline Forms
+Upload a physical form. The agent:
+- Detects the form language via **vision OCR**
 - Extracts every field
-- Auto-fills from your profile
+- Auto-fills from your profile using **multilingual alias matching**
 - Asks for anything missing — by voice
-- Generates a filled PDF you can download and submit
+- Generates a filled PDF
 
-### 6. Get Guided Through Online Applications
-When you want to apply on a government portal:
-- FormSaathi opens the website for you
-- You share your screen
-- The assistant sees what's on screen and speaks step-by-step instructions
-- It dictates your Aadhaar number slowly, in groups of 4
-- It tells you exactly what to type in each field
-- It reminds you to use the mic icon on your keyboard for voice typing
+### 5. Guide Through Online Applications
+The agent sees your screen via **screen share analysis**, speaks step-by-step instructions, and dictates your details field by field.
 
 ---
+
+## Architecture — Agentic Loop
+
+```
+User (Voice/Text)
+       |
+       v
+  Next.js API Route (/api/agent/chat)
+       |
+       v
+  ┌─────────────────────────┐
+  │   AGENTIC LOOP          │
+  │                         │
+  │  1. Build system prompt  │
+  │  2. Call OpenRouter       │
+  │     (Gemini 2.5 Flash)   │
+  │  3. Parse tool calls      │
+  │  4. Execute tools (1-N)   │
+  │  5. Append results        │
+  │  6. Loop until done       │
+  └─────────────────────────┘
+       |
+       v
+  Response + TTS (OpenRouter)
+```
+
+**Key design decisions:**
+- **Server-side agentic loop** — API keys stay on server, tools execute server-side, the model decides when to stop
+- **OpenRouter as the inference layer** — single API for Gemini 2.5 Flash (text, vision, tool calling) and OpenAI GPT-Audio (TTS)
+- **No server-side user data** — everything encrypted in IndexedDB on the device
+- **Single model for everything** — Gemini 2.5 Flash handles text, vision, tool calling, and multilingual reasoning
+- **Voice-first UX** — big mic button, auto-TTS on every page
 
 ## Tech Stack
 
@@ -67,54 +102,32 @@ When you want to apply on a government portal:
 |-------|-----------|
 | Framework | Next.js 15 (App Router) |
 | Auth | Clerk (Google OAuth) |
-| AI Agent | Gemini 2.5 Flash via OpenRouter |
-| TTS | OpenAI GPT-Audio via OpenRouter |
-| STT | Gemini 2.5 Flash via OpenRouter |
-| Vision/OCR | Gemini 2.5 Flash via OpenRouter |
+| **AI Inference** | **OpenRouter** (unified API gateway) |
+| **Agent Model** | **Gemini 2.5 Flash** (text + vision + tool calling) |
+| **TTS** | **OpenAI GPT-Audio** via OpenRouter |
+| **STT** | **Gemini 2.5 Flash** via OpenRouter |
+| **Architecture** | **Agentic loop with 15 autonomous tools** |
 | PDF Generation | pdf-lib |
 | Encryption | Web Crypto API (AES-GCM) |
 | Storage | IndexedDB (on-device only) |
 | i18n | i18next + react-i18next |
 | Styling | Tailwind CSS |
 
-## Architecture
-
-```
-Client (React)                     Server (Next.js API Routes)
-+------------------+              +----------------------------+
-|                  |              |                            |
-|  Voice Chat UI   |---POST----->|  /api/agent/chat           |
-|  - Mic (STT)     |              |  - Builds system prompt    |
-|  - Speaker (TTS) |<--reply-----|  - Calls Gemini 2.5 Flash  |
-|  - Camera        |              |  - Executes 15 tools       |
-|  - Screen Share  |              |  - Returns text + actions  |
-|                  |              |                            |
-|  Encrypted Vault |              |  /api/agent/scan-form      |
-|  (IndexedDB)     |              |  /api/agent/fill-pdf       |
-|                  |              |  /api/agent/screen-guide   |
-|                  |              |  /api/openrouter/*          |
-+------------------+              +----------------------------+
-```
-
-**Key design decisions:**
-- **Server-side agentic loop** — API key stays on server, tools execute server-side
-- **No server-side user data** — everything encrypted in IndexedDB on the device
-- **Single model for everything** — Gemini 2.5 Flash handles text, vision, tool calling, and multilingual reasoning
-- **Voice-first UX** — big mic button, auto-TTS on every page, text input is secondary
-
 ## Agent Tools (15)
+
+The agent can call these tools autonomously in any combination:
 
 | Tool | What it does |
 |------|-------------|
-| `get_user_profile` | Read profile from vault |
+| `get_user_profile` | Read profile from encrypted vault |
 | `update_user_profile` | Save new fields to vault |
 | `find_eligible_schemes` | Match profile against 50+ schemes |
 | `get_scheme_details` | Get scheme info, portal URL, form fields |
 | `translate_text` | Translate between any supported languages |
 | `scan_document` | Vision OCR on Aadhaar cards, forms, documents |
 | `detect_form_language` | Identify form language and script |
-| `extract_form_fields` | Pull all field labels, types, and positions from a form |
-| `fill_form_fields` | Match extracted fields to profile using multilingual alias table |
+| `extract_form_fields` | Pull all field labels, types, and positions |
+| `fill_form_fields` | Match fields to profile via multilingual alias table |
 | `generate_filled_pdf` | Create filled PDF for download |
 | `analyze_screenshot` | Understand what's on a government website |
 | `generate_guidance` | Speak step-by-step instructions for online forms |
@@ -124,20 +137,12 @@ Client (React)                     Server (Next.js API Routes)
 
 ## Privacy
 
-- All personal data is encrypted with AES-GCM and stored only in your browser's IndexedDB
+- All personal data is encrypted with AES-GCM and stored only in IndexedDB
 - Encryption key lives in localStorage — if cleared, data is unrecoverable (by design)
 - No user data is stored on any server
 - Aadhaar images are processed via OpenRouter's API and never stored
-- Sign-out clears all session state and onboarding flags
 
 ## Getting Started
-
-### Prerequisites
-- Node.js 18+
-- Clerk account (for auth)
-- OpenRouter API key
-
-### Setup
 
 ```bash
 git clone https://github.com/RinN0Sekai/FormSaathi.git
@@ -152,7 +157,6 @@ CLERK_SECRET_KEY=sk_test_...
 OPENROUTER_API_KEY=sk-or-v1-...
 ```
 
-Run:
 ```bash
 npm run dev
 ```
@@ -161,7 +165,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Supported Government Schemes (50+)
 
-Ration Card (NFSA), PM-KISAN, PM Fasal Bima Yojana, PM Awas Yojana (Urban & Rural), Sukanya Samriddhi Yojana, PM Matru Vandana Yojana, National Pension Scheme, Ayushman Bharat, PM Ujjwala Yojana, Soil Health Card Scheme, National Scholarship Portal, PM Mudra Yojana, Stand-Up India, Skill India, and many more.
+Ration Card (NFSA), PM-KISAN, PM Fasal Bima Yojana, PM Awas Yojana, Sukanya Samriddhi Yojana, PM Matru Vandana Yojana, National Pension Scheme, Ayushman Bharat, PM Ujjwala Yojana, Soil Health Card, National Scholarship Portal, PM Mudra Yojana, Stand-Up India, Skill India, and many more.
 
 ## License
 
