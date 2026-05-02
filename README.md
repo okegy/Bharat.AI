@@ -6,17 +6,6 @@ FormSaathi is an **agentic AI assistant** with **15 autonomous tools** that help
 
 Built on **OpenRouter** with **agentic engineering** principles: the AI doesn't just answer questions — it reasons, plans, and takes actions using a server-side tool-calling loop.
 
-<p align="center">
-  <a href="https://form-saathi-one.vercel.app">
-    <img src="docs/landing.png" alt="FormSaathi Landing Page" width="800" />
-  </a>
-</p>
-
-<p align="center">
-  <a href="https://form-saathi-one.vercel.app"><strong>Try it live</strong></a>
-</p>
-
----
 
 ## Why Agentic?
 
