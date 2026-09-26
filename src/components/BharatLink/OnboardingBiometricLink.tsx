@@ -1,6 +1,6 @@
 "use client";
 
-import { BiometricSetupNavLink } from "@/components/formsaathi/BiometricSetupNavLink";
+import { BiometricSetupNavLink } from "@/components/BharatLink/BiometricSetupNavLink";
 import { isWebAuthnAvailable } from "@/lib/biometric-storage";
 import "@/lib/i18n";
 import { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ export function OnboardingBiometricLink() {
   if (!show) return null;
 
   return (
-    <BiometricSetupNavLink className="text-sm font-medium text-saathi-forest underline-offset-4 hover:underline">
+    <BiometricSetupNavLink className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline">
       {t("auth.setupFingerprint")}
     </BiometricSetupNavLink>
   );

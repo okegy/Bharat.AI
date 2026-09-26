@@ -1,5 +1,5 @@
 /**
- * Client-side conversation state for the FormSaathi agent.
+ * Client-side conversation state for the BharatLink agent.
  * All state lives in React state / memory — no server persistence.
  */
 

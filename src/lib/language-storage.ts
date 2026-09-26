@@ -4,14 +4,14 @@ import {
 } from "@/lib/indian-languages";
 import { fetchUserLanguage, saveUserLanguage } from "@/lib/openrouter-client";
 
-export const STORAGE_LANGUAGE_CODE = "formsaathi_language_code";
+export const STORAGE_LANGUAGE_CODE = "BharatLink_language_code";
 
 /** Set before navigating to `/onboarding/language` to re-pick (skip auto-redirect). */
-export const SESSION_LANGUAGE_REPICK = "formsaathi_language_repick";
+export const SESSION_LANGUAGE_REPICK = "BharatLink_language_repick";
 
 function dispatchLanguageChange(): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new Event("formsaathi:languagechange"));
+  window.dispatchEvent(new Event("BharatLink:languagechange"));
 }
 
 /** Call before `router.push("/onboarding/language")` so the picker stays open if a language is already saved. */
@@ -37,7 +37,7 @@ export function isLanguageOnboardingComplete(): boolean {
 
 // ─── Full onboarding completion ─────────────────────────
 
-const STORAGE_ONBOARDING_COMPLETE = "formsaathi_onboarding_complete";
+const STORAGE_ONBOARDING_COMPLETE = "BharatLink_onboarding_complete";
 
 export function markOnboardingComplete(): void {
   if (typeof window === "undefined") return;

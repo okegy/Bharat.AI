@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import type { IndianLanguageCode } from "@/lib/indian-languages";
 import { openrouterTranslate } from "@/lib/openrouter-client";
 
-const STORAGE_KEY = "formsaathi_translations";
+const STORAGE_KEY = "BharatLink_translations";
 
 const memoryCache = new Map<string, string>();
 

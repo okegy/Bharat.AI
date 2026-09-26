@@ -1,4 +1,4 @@
-/** Thirteen UI languages including English (FormSaathi product list). */
+/** Thirteen UI languages including English (BharatLink product list). */
 
 export const INDIAN_LANGUAGES = [
   { code: "en", script: "English", label: "English" },

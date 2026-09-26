@@ -75,7 +75,7 @@ export function OnboardingFlowGate({
   }, []);
 
   return (
-    <div className="mx-auto flex min-h-[40vh] max-w-lg items-center justify-center px-6 pt-28 text-center text-sm text-saathi-ink/60">
+    <div className="mx-auto flex min-h-[40vh] max-w-lg items-center justify-center px-6 pt-28 text-center text-sm text-bharatlink-navy/60">
       {t("auth.continuingOnboarding")}
     </div>
   );

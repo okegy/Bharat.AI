@@ -2,13 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { type NextRequest, NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher([
-  "/onboarding(.*)",
   "/dashboard(.*)",
-  "/eligibility(.*)",
-  "/scheme(.*)",
-  "/documents(.*)",
-  "/assistant(.*)",
-  "/form-fill(.*)",
 ]);
 
 /** WebAuthn rp.id must match the browser hostname; localhost ≠ 127.0.0.1. */

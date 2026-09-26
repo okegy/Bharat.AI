@@ -2,10 +2,115 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
 :root {
   color-scheme: light;
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-dm-sans: 'Inter', system-ui, sans-serif;
+  
+  /* BharatLink tokens */
+  --bl-navy:       #0f172a;
+  --bl-teal-dark:  #0f766e;
+  --bl-teal:       #14b8a6;
+  --bl-teal-light: #ccfbf1;
+  --bl-terra:      #ea580c;
+  --bl-cream:      #fdfbf7;
+  --bl-sand:       #f3ede4;
+}
+
+/* ─── Base ───────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  @apply bg-saathi-cream text-saathi-ink antialiased;
+  background-color: var(--bl-cream);
+  color: var(--bl-navy);
+  font-family: var(--font-dm-sans);
+  font-size: 16px;
+  line-height: 1.6;
 }
+
+/* ─── Focus ring ─────────────────── */
+:focus-visible {
+  outline: 2.5px solid var(--bl-teal);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─── Scrollbar ──────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bl-sand); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bl-teal-light); }
+
+/* ─── Typography helpers ─────────── */
+.font-display { font-family: var(--font-display); }
+
+/* ─── Gradient mesh hero ─────────── */
+.bg-hero-mesh {
+  background:
+    radial-gradient(ellipse 110% 70% at 55% -10%, rgba(20,184,166,0.18), transparent 55%),
+    radial-gradient(ellipse 70% 55% at 100% 0%,   rgba(234,88,12,0.10),  transparent 55%),
+    radial-gradient(ellipse 50% 50% at 0% 100%,   rgba(15,118,110,0.08), transparent 55%),
+    var(--bl-cream);
+}
+
+/* ─── Glass card ─────────────────── */
+.glass {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.6);
+}
+
+/* ─── Waveform animation ─────────── */
+@keyframes waveBar {
+  0%, 100% { transform: scaleY(0.4); opacity: 0.45; }
+  50%       { transform: scaleY(1.0); opacity: 1;    }
+}
+.animate-wave {
+  animation: waveBar 1.0s ease-in-out infinite;
+}
+
+/* ─── Float animation ────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+.animate-float { animation: float 5s ease-in-out infinite; }
+
+/* ─── Pulse bar ──────────────────── */
+@keyframes pulsebar {
+  0%, 100% { opacity: 0.35; transform: scaleY(0.5); }
+  50%       { opacity: 1;    transform: scaleY(1);   }
+}
+.animate-pulsebar { animation: pulsebar 1.2s ease-in-out infinite; }
+
+/* ─── Shimmer loading ────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0;  }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--bl-sand) 25%, #fff 50%, var(--bl-sand) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ─── Touch target helpers ───────── */
+.touch-target {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* ─── Safe area padding ──────────── */
+.pb-safe  { padding-bottom: env(safe-area-inset-bottom, 16px); }
+.pt-safe  { padding-top:    env(safe-area-inset-top, 0px);    }

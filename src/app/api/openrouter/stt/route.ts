@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import {
   getOpenRouterSttModel,
@@ -18,9 +17,6 @@ function formatFromMime(mime: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (!OPENROUTER_API_KEY) {
     return NextResponse.json(

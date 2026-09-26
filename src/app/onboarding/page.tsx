@@ -1,4 +1,4 @@
-import { OnboardingFlowGate } from "@/components/formsaathi/OnboardingFlowGate";
+import { OnboardingFlowGate } from "@/components/BharatLink/OnboardingFlowGate";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { TopBar } from "@/components/formsaathi/TopBar";
+import { TopBar } from "@/components/BharatLink/TopBar";
 import { useAppLanguage } from "@/lib/app-language";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -84,10 +84,10 @@ export default function EligibilityPage() {
       <main className="mx-auto max-w-3xl px-4 pb-24 pt-24 sm:px-6">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-semibold text-saathi-ink sm:text-4xl">
+            <h1 className="font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
               {getUiText(language, "Eligible schemes")}
             </h1>
-            <p className="mt-1 text-saathi-ink/60">
+            <p className="mt-1 text-bharatlink-navy/60">
               {loading
                 ? getUiText(language, "Loading…")
                 : getEligibilityHeaderText(
@@ -104,7 +104,7 @@ export default function EligibilityPage() {
               className={`mt-1 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition ${
                 announcing
                   ? "bg-red-50 text-red-700 hover:bg-red-100"
-                  : "bg-saathi-forest/10 text-saathi-forest hover:bg-saathi-forest/20"
+                  : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark/20"
               }`}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -124,8 +124,8 @@ export default function EligibilityPage() {
               onClick={() => setFilter(cat)}
               className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium capitalize transition ${
                 filter === cat
-                  ? "bg-saathi-forest text-white"
-                  : "bg-saathi-sand/60 text-saathi-ink/70 hover:bg-saathi-sand"
+                  ? "bg-bharatlink-tealDark text-white"
+                  : "bg-bharatlink-sand/60 text-bharatlink-navy/70 hover:bg-bharatlink-sand"
               }`}
             >
               {getCategoryLabel(language, cat)}
@@ -135,16 +135,16 @@ export default function EligibilityPage() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-saathi-sand bg-white p-8 text-center">
-            <p className="text-saathi-ink/60">
+          <div className="rounded-2xl border border-bharatlink-sand bg-white p-8 text-center">
+            <p className="text-bharatlink-navy/60">
               {getUiText(language, "No matching schemes found.")}
             </p>
             <Link
               href="/onboarding/voice"
-              className="mt-3 inline-block text-sm font-medium text-saathi-forest hover:underline"
+              className="mt-3 inline-block text-sm font-medium text-bharatlink-tealDark hover:underline"
             >
               {getUiText(language, "Complete your profile to see more →")}
             </Link>
@@ -155,31 +155,31 @@ export default function EligibilityPage() {
               <Link
                 key={scheme.id}
                 href={`/scheme/${scheme.id}`}
-                className="group block rounded-2xl border border-saathi-sand bg-white p-5 transition hover:border-saathi-forest hover:shadow-sm"
+                className="group block rounded-2xl border border-bharatlink-sand bg-white p-5 transition hover:border-bharatlink-tealDark hover:shadow-sm"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="rounded bg-saathi-sand/80 px-1.5 py-0.5 text-[10px] font-medium uppercase text-saathi-ink/50">
+                      <span className="rounded bg-bharatlink-sand/80 px-1.5 py-0.5 text-[10px] font-medium uppercase text-bharatlink-navy/50">
                         {getCategoryLabel(language, scheme.category)}
                       </span>
-                      <span className="rounded bg-saathi-mint/30 px-1.5 py-0.5 text-[10px] font-medium text-saathi-forest">
+                      <span className="rounded bg-bharatlink-tealLight/30 px-1.5 py-0.5 text-[10px] font-medium text-bharatlink-tealDark">
                         {getBenefitLabel(language, scheme.benefitType)}
                       </span>
                     </div>
-                    <h3 className="mt-2 text-sm font-semibold text-saathi-ink group-hover:text-saathi-forest">
+                    <h3 className="mt-2 text-sm font-semibold text-bharatlink-navy group-hover:text-bharatlink-tealDark">
                       {translatedNames[idx] ?? scheme.name}
                     </h3>
-                    <p className="mt-0.5 text-xs text-saathi-ink/50">{scheme.department}</p>
-                    <p className="mt-2 text-xs leading-relaxed text-saathi-ink/60 line-clamp-2">
+                    <p className="mt-0.5 text-xs text-bharatlink-navy/50">{scheme.department}</p>
+                    <p className="mt-2 text-xs leading-relaxed text-bharatlink-navy/60 line-clamp-2">
                       {translatedDescs[idx] ?? scheme.description}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1.5">
-                    <span className="whitespace-nowrap rounded-full bg-saathi-mint/40 px-3 py-1 text-sm font-bold text-saathi-forest">
+                    <span className="whitespace-nowrap rounded-full bg-bharatlink-tealLight/40 px-3 py-1 text-sm font-bold text-bharatlink-tealDark">
                       ₹{scheme.estimatedBenefitINR.toLocaleString(locale)}
                     </span>
-                    <span className="text-[10px] font-medium text-saathi-ink/40">
+                    <span className="text-[10px] font-medium text-bharatlink-navy/40">
                       {Math.round(score * 100)}% {getMatchLabel(language)}
                     </span>
                   </div>
@@ -189,7 +189,7 @@ export default function EligibilityPage() {
                     {getUiText(language, "Missing info:")} {missingFields.join(", ")}
                   </p>
                 )}
-                <div className="mt-3 text-xs font-medium text-saathi-forest opacity-0 transition group-hover:opacity-100">
+                <div className="mt-3 text-xs font-medium text-bharatlink-tealDark opacity-0 transition group-hover:opacity-100">
                   {getUiText(language, "Apply now →")}
                 </div>
               </Link>
@@ -198,7 +198,7 @@ export default function EligibilityPage() {
         )}
 
         <div className="mt-8 flex gap-4">
-          <Link href="/dashboard" className="text-sm font-medium text-saathi-forest underline-offset-4 hover:underline">
+          <Link href="/dashboard" className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline">
             {`← ${getUiText(language, "Dashboard")}`}
           </Link>
         </div>

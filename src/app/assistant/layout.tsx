@@ -1,4 +1,4 @@
-import { VaultUnlockGate } from "@/components/formsaathi/VaultUnlockGate";
+import { VaultUnlockGate } from "@/components/BharatLink/VaultUnlockGate";
 
 export default function AssistantLayout({
   children,

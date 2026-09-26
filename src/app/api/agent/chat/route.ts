@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import type { ProfileData } from "@/lib/profile-vault";
 import type { IndianLanguageCode } from "@/lib/indian-languages";
@@ -87,7 +86,7 @@ If there ARE missing fields, ask for them FIRST, then generate the PDF once the 
     ? "\nScreen sharing is ACTIVE. You will receive periodic screenshots. Analyze them and guide the user."
     : "";
 
-  return `You are FormSaathi, a kind and patient voice assistant helping Indian citizens access government schemes and fill forms. You communicate in ${langLabel}.
+  return `You are BharatLink, a kind and patient voice assistant helping Indian citizens access government schemes and fill forms. You communicate in ${langLabel}.
 
 RULES:
 - Always respond in ${langLabel}. Never switch languages unless the user does.
@@ -107,9 +106,6 @@ ${phaseInstructions[phase]}${screenNote}`;
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (!OPENROUTER_API_KEY)
     return NextResponse.json(

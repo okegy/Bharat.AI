@@ -72,7 +72,7 @@ export function VaultUnlockGate({
   if (gate === "unknown") {
     return (
       <div className="mx-auto flex min-h-screen max-w-lg items-center justify-center px-6 pt-20">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
       </div>
     );
   }
@@ -84,13 +84,13 @@ export function VaultUnlockGate({
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-6 px-6 pb-24 pt-28">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-saathi-forest">
+        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
           {t("auth.protectedDetails")}
         </p>
-        <h1 className="mt-2 font-display text-2xl font-semibold text-saathi-ink">
+        <h1 className="mt-2 font-display text-2xl font-semibold text-bharatlink-navy">
           {t("auth.unlockToContinue")}
         </h1>
-        <p className="mt-2 text-sm text-saathi-ink/60">
+        <p className="mt-2 text-sm text-bharatlink-navy/60">
           {t("auth.unlockDescription")}
         </p>
       </div>
@@ -105,7 +105,7 @@ export function VaultUnlockGate({
         type="button"
         disabled={busy}
         onClick={() => void onUnlock()}
-        className="rounded-full bg-saathi-forest py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink disabled:opacity-50"
+        className="rounded-full bg-bharatlink-tealDark py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy disabled:opacity-50"
       >
         {busy ? t("auth.waiting") : t("auth.unlockWithDevice")}
       </button>
@@ -122,7 +122,7 @@ export function VaultUnlockGate({
 
       <Link
         href="/"
-        className="text-center text-sm font-medium text-saathi-ink/50 underline-offset-4 hover:text-saathi-forest hover:underline"
+        className="text-center text-sm font-medium text-bharatlink-navy/50 underline-offset-4 hover:text-bharatlink-tealDark hover:underline"
       >
         {t("nav.backToHome")}
       </Link>

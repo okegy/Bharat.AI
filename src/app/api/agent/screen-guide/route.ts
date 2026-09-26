@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import type { IndianLanguageCode } from "@/lib/indian-languages";
 import {
@@ -10,9 +9,6 @@ import {
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (!OPENROUTER_API_KEY)
     return NextResponse.json(

@@ -2,9 +2,9 @@
 
 import { Trans, useTranslation } from "react-i18next";
 import { useEffect, useRef } from "react";
-import { GetStartedButton } from "@/components/formsaathi/GetStartedButton";
-import { ResumeOnboardingRedirect } from "@/components/formsaathi/ResumeOnboardingRedirect";
-import { TopBar } from "@/components/formsaathi/TopBar";
+import { GetStartedButton } from "@/components/BharatLink/GetStartedButton";
+import { ResumeOnboardingRedirect } from "@/components/BharatLink/ResumeOnboardingRedirect";
+import { TopBar } from "@/components/BharatLink/TopBar";
 import { INDIAN_LANGUAGES } from "@/lib/indian-languages";
 import { useAppLanguage } from "@/lib/app-language";
 import { speak, stopSpeaking } from "@/lib/speech-engine";
@@ -25,7 +25,7 @@ const STEP_ICONS = [
 function StepIcon({ name }: { name: (typeof STEP_ICONS)[number] }) {
   const stroke = "currentColor";
   const common = {
-    className: "h-8 w-8 text-saathi-forest",
+    className: "h-8 w-8 text-bharatlink-tealDark",
     fill: "none",
     viewBox: "0 0 24 24",
     strokeWidth: 1.5,
@@ -154,28 +154,28 @@ export default function Home() {
       <ResumeOnboardingRedirect />
       <main>
         <section className="relative overflow-hidden bg-hero-mesh px-4 pb-20 pt-28 sm:px-6 sm:pb-28 sm:pt-32">
-          <div className="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-saathi-mint/40 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-saathi-sky/15 blur-3xl" />
+          <div className="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-bharatlink-tealLight/40 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-bharatlink-terracotta/15 blur-3xl" />
 
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div className="relative z-10">
-              <p className="mb-4 inline-flex items-center rounded-full border border-saathi-forest/20 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-saathi-forest backdrop-blur">
+              <p className="mb-4 inline-flex items-center rounded-full border border-bharatlink-tealDark/20 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-bharatlink-tealDark backdrop-blur">
                 {t("home.badge")}
               </p>
-              <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-saathi-ink sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
+              <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-bharatlink-navy sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
                 <Trans
                   i18nKey="home.heroTitle"
                   components={{
-                    1: <span className="text-saathi-forest" />,
+                    1: <span className="text-bharatlink-tealDark" />,
                   }}
                 />
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-saathi-ink/80">
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-bharatlink-navy/80">
                 {t("home.heroDescription")}
               </p>
               <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <GetStartedButton />
-                <p className="max-w-xs text-sm text-saathi-ink/60">
+                <p className="max-w-xs text-sm text-bharatlink-navy/60">
                   {t("home.heroSubtext")}
                 </p>
               </div>
@@ -183,27 +183,27 @@ export default function Home() {
 
             <div className="relative z-10 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-md animate-float">
-                <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-saathi-mint/50 to-saathi-sky/20 blur-xl" />
-                <div className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-white/90 p-8 shadow-xl shadow-saathi-ink/10 backdrop-blur">
+                <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-bharatlink-tealLight/50 to-bharatlink-terracotta/20 blur-xl" />
+                <div className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-white/90 p-8 shadow-xl shadow-bharatlink-navy/10 backdrop-blur">
                   <div className="mb-6 flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-red-400" />
                     <span className="h-2 w-2 rounded-full bg-amber-400" />
                     <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span className="ml-auto text-xs font-medium text-saathi-ink/45">
+                    <span className="ml-auto text-xs font-medium text-bharatlink-navy/45">
                       {t("home.govtPortalPreview")}
                     </span>
                   </div>
-                  <div className="space-y-3 rounded-2xl bg-saathi-cream p-4">
-                    <div className="h-2 w-3/4 rounded bg-saathi-sand" />
-                    <div className="h-2 w-full rounded bg-saathi-mint/60" />
-                    <div className="h-2 w-5/6 rounded bg-saathi-sand" />
-                    <div className="h-2 w-2/3 rounded bg-saathi-sand" />
+                  <div className="space-y-3 rounded-2xl bg-bharatlink-cream p-4">
+                    <div className="h-2 w-3/4 rounded bg-bharatlink-sand" />
+                    <div className="h-2 w-full rounded bg-bharatlink-tealLight/60" />
+                    <div className="h-2 w-5/6 rounded bg-bharatlink-sand" />
+                    <div className="h-2 w-2/3 rounded bg-bharatlink-sand" />
                   </div>
                   <div className="mt-6 flex h-14 items-end justify-center gap-1.5">
                     {[10, 18, 7, 22, 12, 24, 9, 20, 8, 23, 14].map((h, i) => (
                       <span
                         key={i}
-                        className="w-1.5 rounded-full bg-saathi-forest/70 animate-pulsebar"
+                        className="w-1.5 rounded-full bg-bharatlink-tealDark/70 animate-pulsebar"
                         style={{
                           height: `${h}px`,
                           animationDelay: `${i * 0.08}s`,
@@ -211,7 +211,7 @@ export default function Home() {
                       />
                     ))}
                   </div>
-                  <p className="mt-4 text-center text-xs text-saathi-ink/50">
+                  <p className="mt-4 text-center text-xs text-bharatlink-navy/50">
                     {t("home.agentNarrates")}
                   </p>
                 </div>
@@ -220,24 +220,24 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="border-y border-saathi-sand bg-white px-4 py-16 sm:px-6">
+        <section className="border-y border-bharatlink-sand bg-white px-4 py-16 sm:px-6">
           <div className="mx-auto max-w-6xl">
-            <h2 className="font-display text-2xl font-semibold text-saathi-ink sm:text-3xl">
+            <h2 className="font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
               {t("home.langSectionTitle")}
             </h2>
-            <p className="mt-2 max-w-2xl text-saathi-ink/70">
+            <p className="mt-2 max-w-2xl text-bharatlink-navy/70">
               {t("home.langSectionDesc")}
             </p>
             <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {INDIAN_LANGUAGES.map((lang) => (
                 <li
                   key={lang.code}
-                  className="rounded-2xl border border-saathi-sand bg-saathi-cream/50 px-4 py-4 text-center transition hover:border-saathi-mint/80 hover:bg-white"
+                  className="rounded-2xl border border-bharatlink-sand bg-bharatlink-cream/50 px-4 py-4 text-center transition hover:border-bharatlink-tealLight/80 hover:bg-white"
                 >
-                  <span className="block text-lg font-medium text-saathi-ink">
+                  <span className="block text-lg font-medium text-bharatlink-navy">
                     {lang.script}
                   </span>
-                  <span className="mt-1 block text-xs text-saathi-ink/50">
+                  <span className="mt-1 block text-xs text-bharatlink-navy/50">
                     {lang.label}
                   </span>
                 </li>
@@ -248,14 +248,14 @@ export default function Home() {
 
         <section className="px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-6xl">
-            <h2 className="font-display text-2xl font-semibold text-saathi-ink sm:text-3xl">
+            <h2 className="font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
               {t("home.stepsTitle")}
             </h2>
-            <p className="mt-2 max-w-2xl text-saathi-ink/70">
+            <p className="mt-2 max-w-2xl text-bharatlink-navy/70">
               {t("home.stepsSubtitle")}
             </p>
 
-            <ol className="relative mt-14 space-y-10 before:absolute before:left-[1.15rem] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-saathi-sand sm:before:left-6">
+            <ol className="relative mt-14 space-y-10 before:absolute before:left-[1.15rem] before:top-3 before:h-[calc(100%-1.5rem)] before:w-px before:bg-bharatlink-sand sm:before:left-6">
               {STEP_ICONS.map((icon, i) => {
                 const n = i + 1;
                 return (
@@ -263,17 +263,17 @@ export default function Home() {
                     key={icon}
                     className="relative grid gap-4 pl-14 sm:grid-cols-[auto_1fr] sm:gap-8 sm:pl-20"
                   >
-                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-2xl border border-saathi-sand bg-white shadow-sm sm:left-1 sm:h-12 sm:w-12">
+                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-2xl border border-bharatlink-sand bg-white shadow-sm sm:left-1 sm:h-12 sm:w-12">
                       <StepIcon name={icon} />
                     </div>
                     <div className="pt-0.5 sm:pt-1">
-                      <p className="text-xs font-bold uppercase tracking-widest text-saathi-forest/80">
+                      <p className="text-xs font-bold uppercase tracking-widest text-bharatlink-tealDark/80">
                         {t("home.step", { num: n })}
                       </p>
-                      <h3 className="mt-1 font-display text-xl font-semibold text-saathi-ink">
+                      <h3 className="mt-1 font-display text-xl font-semibold text-bharatlink-navy">
                         {t(`home.step${n}Title`)}
                       </h3>
-                      <p className="mt-2 max-w-prose leading-relaxed text-saathi-ink/75">
+                      <p className="mt-2 max-w-prose leading-relaxed text-bharatlink-navy/75">
                         {t(`home.step${n}Body`)}
                       </p>
                     </div>
@@ -284,12 +284,12 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="border-t border-saathi-sand bg-saathi-ink px-4 py-16 text-saathi-cream sm:px-6">
+        <section className="border-t border-bharatlink-sand bg-bharatlink-navy px-4 py-16 text-bharatlink-cream sm:px-6">
           <div className="mx-auto max-w-6xl">
             <h2 className="font-display text-2xl font-semibold sm:text-3xl">
               {t("home.sayNatural")}
             </h2>
-            <p className="mt-2 max-w-2xl text-saathi-cream/70">
+            <p className="mt-2 max-w-2xl text-bharatlink-cream/70">
               {t("home.sayNaturalDesc")}
             </p>
             <ul className="mt-10 grid gap-4 sm:grid-cols-2">
@@ -298,7 +298,7 @@ export default function Home() {
               ).map((key) => (
                 <li
                   key={key}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-lg leading-snug text-saathi-mint/95 backdrop-blur"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-lg leading-snug text-bharatlink-tealLight/95 backdrop-blur"
                 >
                   {t(`home.${key}`)}
                 </li>
@@ -308,17 +308,17 @@ export default function Home() {
         </section>
 
         <section className="px-4 py-16 sm:px-6">
-          <div className="mx-auto max-w-6xl rounded-[2rem] border border-saathi-sand bg-gradient-to-br from-white to-saathi-cream p-8 shadow-sm sm:p-10">
-            <h2 className="font-display text-2xl font-semibold text-saathi-ink">
+          <div className="mx-auto max-w-6xl rounded-[2rem] border border-bharatlink-sand bg-gradient-to-br from-white to-bharatlink-cream p-8 shadow-sm sm:p-10">
+            <h2 className="font-display text-2xl font-semibold text-bharatlink-navy">
               {t("home.vaultTitle")}
             </h2>
-            <p className="mt-2 max-w-xl text-saathi-ink/75">
+            <p className="mt-2 max-w-xl text-bharatlink-navy/75">
               {t("home.vaultDesc")}
             </p>
           </div>
         </section>
 
-        <footer className="border-t border-saathi-sand px-4 py-10 text-center text-sm text-saathi-ink/55 sm:px-6">
+        <footer className="border-t border-bharatlink-sand px-4 py-10 text-center text-sm text-bharatlink-navy/55 sm:px-6">
           <p>{t("home.footer")}</p>
         </footer>
       </main>

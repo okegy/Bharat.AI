@@ -1,28 +1,35 @@
 import type { Metadata } from "next";
-import { ClearVaultUnlockOnSignOut } from "@/components/formsaathi/ClearVaultUnlockOnSignOut";
+import { ClearVaultUnlockOnSignOut } from "@/components/BharatLink/ClearVaultUnlockOnSignOut";
 import { LanguageProvider } from "@/lib/app-language";
 import { ClerkProvider } from "@clerk/nextjs";
-import { DM_Sans, Fraunces } from "next/font/google";
+import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   display: "swap",
 });
 
-const fraunces = Fraunces({
+const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "FormSaathi — Government forms, in your language",
+  title: "BharatLink — Connecting every voice to the care it needs",
   description:
-    "Speak your need. FormSaathi checks schemes, fills portals, and walks you through documents—voice-first, in Indian languages.",
+    "BharatLink helps citizens access government schemes, fill forms, and navigate portals — voice-first, in 13 Indian languages, for free.",
+  keywords: ["government schemes", "Indian languages", "form filling", "PM-KISAN", "BharatLink", "AI assistant"],
+  openGraph: {
+    title: "BharatLink",
+    description: "Connecting every voice, every language, to the care and services they need.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -33,12 +40,12 @@ export default function RootLayout({
   return (
     <ClerkProvider
       afterSignOutUrl="/"
-      signInForceRedirectUrl="/onboarding"
-      signUpForceRedirectUrl="/onboarding"
-      signInFallbackRedirectUrl="/onboarding"
-      signUpFallbackRedirectUrl="/onboarding"
+      signInForceRedirectUrl="/dashboard"
+      signUpForceRedirectUrl="/dashboard"
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/dashboard"
     >
-      <html lang="en" className={`${dmSans.variable} ${fraunces.variable}`}>
+      <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
         <body className="min-h-screen font-sans">
           <LanguageProvider>
             <ClearVaultUnlockOnSignOut />
@@ -49,3 +56,4 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
+

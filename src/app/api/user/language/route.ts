@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
   const { userId } = await auth();
-  if (!userId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!userId) return NextResponse.json({ language: null });
 
   try {
     const client = await clerkClient();
@@ -20,8 +19,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   const { userId } = await auth();
-  if (!userId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { language } = (await request.json()) as { language: string };
   if (!language)

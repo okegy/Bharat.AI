@@ -1,12 +1,12 @@
 /** localStorage keys — credential data stays on this device only. */
 
-export const STORAGE_PASSKEY_REGISTERED = "formsaathi_passkey_registered";
-export const STORAGE_PASSKEY_SKIPPED = "formsaathi_passkey_skipped";
-export const STORAGE_CREDENTIAL_ID = "formsaathi_webauthn_credential_id";
+export const STORAGE_PASSKEY_REGISTERED = "BharatLink_passkey_registered";
+export const STORAGE_PASSKEY_SKIPPED = "BharatLink_passkey_skipped";
+export const STORAGE_CREDENTIAL_ID = "BharatLink_webauthn_credential_id";
 
 /** Set before opening `/onboarding/biometric` so the screen stays usable after onboarding (skip/register). */
 export const SESSION_BIOMETRIC_SETUP_INTENT =
-  "formsaathi_biometric_setup_intent";
+  "BharatLink_biometric_setup_intent";
 
 export function markBiometricSetupIntent(): void {
   if (typeof window === "undefined") return;
@@ -35,7 +35,7 @@ export function markPasskeySkipped(): void {
   localStorage.setItem(STORAGE_PASSKEY_SKIPPED, "1");
 }
 
-const SESSION_VAULT_UNLOCKED_AT = "formsaathi_vault_unlocked_at";
+const SESSION_VAULT_UNLOCKED_AT = "BharatLink_vault_unlocked_at";
 
 /** Re-verify passkey after this idle period (per browser tab session). */
 const VAULT_UNLOCK_MAX_AGE_MS = 30 * 60 * 1000;
@@ -261,7 +261,7 @@ export async function registerDevicePasskey(params: {
 
   const base: PublicKeyCredentialCreationOptions = {
     challenge: randomChallenge(),
-    rp: { name: "FormSaathi", id: rpId },
+    rp: { name: "BharatLink", id: rpId },
     user: {
       id: userHandleFromClerkId(params.userId),
       name: params.username.slice(0, 64),

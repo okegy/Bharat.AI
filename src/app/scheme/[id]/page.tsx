@@ -1,6 +1,6 @@
 "use client";
 
-import { TopBar } from "@/components/formsaathi/TopBar";
+import { TopBar } from "@/components/BharatLink/TopBar";
 import { useAppLanguage } from "@/lib/app-language";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -235,7 +235,7 @@ export default function SchemeFormPage() {
       <>
         <TopBar />
         <main className="mx-auto flex min-h-screen max-w-2xl items-center justify-center px-6 pt-28">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
         </main>
       </>
     );
@@ -268,22 +268,22 @@ export default function SchemeFormPage() {
               />
             </svg>
           </div>
-          <h1 className="font-display text-3xl font-semibold text-saathi-ink">
+          <h1 className="font-display text-3xl font-semibold text-bharatlink-navy">
             {t("scheme.portalDoneTitle")}
           </h1>
-          <p className="text-saathi-ink/70">
+          <p className="text-bharatlink-navy/70">
             {t("scheme.portalDoneDesc", { portal: scheme.portalUrl })}
           </p>
           <div className="flex gap-4">
             <Link
               href="/dashboard"
-              className="rounded-full bg-saathi-forest px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+              className="rounded-full bg-bharatlink-tealDark px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
             >
               {getUiText(language, "Dashboard")}
             </Link>
             <Link
               href="/eligibility"
-              className="rounded-full border border-saathi-sand px-6 py-2.5 text-sm font-medium text-saathi-ink hover:bg-white"
+              className="rounded-full border border-bharatlink-sand px-6 py-2.5 text-sm font-medium text-bharatlink-navy hover:bg-white"
             >
               {t("scheme.moreSchemes")}
             </Link>
@@ -306,10 +306,10 @@ export default function SchemeFormPage() {
               {t("scheme.portalOpened")}
             </span>
           </div>
-          <h1 className="font-display text-2xl font-semibold text-saathi-ink sm:text-3xl">
+          <h1 className="font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
             {translatedName || scheme.name}
           </h1>
-          <p className="mt-1 text-xs text-saathi-ink/50">{scheme.department}</p>
+          <p className="mt-1 text-xs text-bharatlink-navy/50">{scheme.department}</p>
 
           {/* Assist banner */}
           <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
@@ -378,7 +378,7 @@ export default function SchemeFormPage() {
                   "noopener,noreferrer",
                 )
               }
-              className="flex items-center gap-1.5 rounded-full bg-saathi-forest px-4 py-2 text-xs font-semibold text-white transition hover:bg-saathi-ink"
+              className="flex items-center gap-1.5 rounded-full bg-bharatlink-tealDark px-4 py-2 text-xs font-semibold text-white transition hover:bg-bharatlink-navy"
             >
               <ExternalLinkIcon />
               {t("scheme.openPortalAgain")}
@@ -397,7 +397,7 @@ export default function SchemeFormPage() {
                 className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition ${
                   narrating
                     ? "bg-red-50 text-red-700"
-                    : "bg-saathi-forest/10 text-saathi-forest hover:bg-saathi-forest/20"
+                    : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark/20"
                 }`}
               >
                 <SpeakerIcon />
@@ -408,7 +408,7 @@ export default function SchemeFormPage() {
               <button
                 type="button"
                 onClick={() => askForMissing(emptyFields[0]!, emptyFields)}
-                className="flex items-center gap-1.5 rounded-full bg-saathi-forest/10 px-4 py-2 text-xs font-semibold text-saathi-forest transition hover:bg-saathi-forest/20"
+                className="flex items-center gap-1.5 rounded-full bg-bharatlink-tealDark/10 px-4 py-2 text-xs font-semibold text-bharatlink-tealDark transition hover:bg-bharatlink-tealDark/20"
               >
                 <MicIcon />
                 {t("scheme.fillMissingCount", { count: emptyFields.length })}
@@ -428,17 +428,17 @@ export default function SchemeFormPage() {
                     isCopied
                       ? "border-green-300 bg-green-50"
                       : val
-                        ? "border-saathi-sand"
+                        ? "border-bharatlink-sand"
                         : "border-amber-200 bg-amber-50/30"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-saathi-forest/10 text-[10px] font-bold text-saathi-forest">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-bharatlink-tealDark/10 text-[10px] font-bold text-bharatlink-tealDark">
                           {idx + 1}
                         </span>
-                        <p className="text-xs font-medium text-saathi-ink/60">
+                        <p className="text-xs font-medium text-bharatlink-navy/60">
                           {getFieldLabel(language, field.label)}
                           {field.required && (
                             <span className="text-red-400"> *</span>
@@ -456,7 +456,7 @@ export default function SchemeFormPage() {
                         )}
                       </div>
                       {val ? (
-                        <p className="mt-1 text-sm font-semibold text-saathi-ink">
+                        <p className="mt-1 text-sm font-semibold text-bharatlink-navy">
                           {val}
                         </p>
                       ) : (
@@ -472,7 +472,7 @@ export default function SchemeFormPage() {
                         className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
                           isCopied
                             ? "bg-green-600 text-white"
-                            : "bg-saathi-forest/10 text-saathi-forest hover:bg-saathi-forest hover:text-white"
+                            : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark hover:text-white"
                         }`}
                       >
                         {isCopied ? (
@@ -494,14 +494,14 @@ export default function SchemeFormPage() {
 
           {/* Required documents */}
           <div className="mt-8">
-            <h2 className="text-sm font-semibold text-saathi-ink">
+            <h2 className="text-sm font-semibold text-bharatlink-navy">
               {t("scheme.requiredDocuments")}
             </h2>
             <ul className="mt-2 space-y-1.5">
               {scheme.requiredDocuments.map((doc) => (
                 <li
                   key={doc}
-                  className="flex items-center gap-2 text-xs text-saathi-ink/60"
+                  className="flex items-center gap-2 text-xs text-bharatlink-navy/60"
                 >
                   <DocIcon />
                   {doc}
@@ -515,13 +515,13 @@ export default function SchemeFormPage() {
             <button
               type="button"
               onClick={() => void markDone()}
-              className="flex-1 rounded-full bg-saathi-forest py-3 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+              className="flex-1 rounded-full bg-bharatlink-tealDark py-3 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
             >
               {t("scheme.markDone")}
             </button>
             <Link
               href="/dashboard"
-              className="flex items-center justify-center rounded-full border border-saathi-sand px-6 py-3 text-sm font-medium text-saathi-ink hover:bg-white"
+              className="flex items-center justify-center rounded-full border border-bharatlink-sand px-6 py-3 text-sm font-medium text-bharatlink-navy hover:bg-white"
             >
               {getUiText(language, "Back")}
             </Link>
@@ -539,20 +539,20 @@ export default function SchemeFormPage() {
         {/* Scheme header */}
         <div className="mb-6">
           <div className="flex items-center gap-2">
-            <span className="rounded bg-saathi-sand/80 px-1.5 py-0.5 text-[10px] font-medium uppercase text-saathi-ink/50">
+            <span className="rounded bg-bharatlink-sand/80 px-1.5 py-0.5 text-[10px] font-medium uppercase text-bharatlink-navy/50">
               {scheme.category}
             </span>
-            <span className="rounded bg-saathi-mint/30 px-1.5 py-0.5 text-[10px] font-medium text-saathi-forest">
+            <span className="rounded bg-bharatlink-tealLight/30 px-1.5 py-0.5 text-[10px] font-medium text-bharatlink-tealDark">
               ₹{scheme.estimatedBenefitINR.toLocaleString(locale)}
             </span>
           </div>
-          <h1 className="mt-2 font-display text-2xl font-semibold text-saathi-ink sm:text-3xl">
+          <h1 className="mt-2 font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
             {translatedName || scheme.name}
           </h1>
-          <p className="mt-1 text-xs text-saathi-ink/50">
+          <p className="mt-1 text-xs text-bharatlink-navy/50">
             {scheme.department}
           </p>
-          <p className="mt-2 text-sm leading-relaxed text-saathi-ink/70">
+          <p className="mt-2 text-sm leading-relaxed text-bharatlink-navy/70">
             {translatedDesc || scheme.description}
           </p>
         </div>
@@ -570,11 +570,11 @@ export default function SchemeFormPage() {
         )}
 
         {/* Portal link preview */}
-        <div className="mb-6 rounded-2xl border border-saathi-sand bg-saathi-cream/50 px-4 py-3">
-          <p className="text-xs text-saathi-ink/50">
+        <div className="mb-6 rounded-2xl border border-bharatlink-sand bg-bharatlink-cream/50 px-4 py-3">
+          <p className="text-xs text-bharatlink-navy/50">
             {t("scheme.officialPortal")}
           </p>
-          <p className="text-sm font-medium text-saathi-forest">
+          <p className="text-sm font-medium text-bharatlink-tealDark">
             {scheme.portalUrl}
           </p>
         </div>
@@ -631,7 +631,7 @@ export default function SchemeFormPage() {
             <button
               type="button"
               onClick={() => askForMissing(emptyFields[0]!, emptyFields)}
-              className="flex items-center gap-1.5 rounded-full bg-saathi-forest/10 px-4 py-2 text-xs font-semibold text-saathi-forest transition hover:bg-saathi-forest/20"
+              className="flex items-center gap-1.5 rounded-full bg-bharatlink-tealDark/10 px-4 py-2 text-xs font-semibold text-bharatlink-tealDark transition hover:bg-bharatlink-tealDark/20"
             >
               <MicIcon />
               {t("scheme.fillMissingCount", { count: emptyFields.length })}
@@ -644,7 +644,7 @@ export default function SchemeFormPage() {
           {scheme.formFields.map((field) => (
             <div key={field.id}>
               <div className="mb-1 flex items-center gap-2">
-                <label className="text-xs font-medium text-saathi-ink/70">
+                <label className="text-xs font-medium text-bharatlink-navy/70">
                   {getFieldLabel(language, field.label)}
                   {field.required && (
                     <span className="text-red-400"> *</span>
@@ -667,7 +667,7 @@ export default function SchemeFormPage() {
                   onChange={(e) =>
                     setFieldValue(field.id, e.target.value, "manual")
                   }
-                  className="w-full rounded-xl border border-saathi-sand bg-white px-4 py-2.5 text-sm text-saathi-ink outline-none transition focus:border-saathi-forest focus:ring-1 focus:ring-saathi-mint"
+                  className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
                 >
                   <option value="">{getUiText(language, "Select…")}</option>
                   {field.options.map((opt) => (
@@ -683,7 +683,7 @@ export default function SchemeFormPage() {
                     setFieldValue(field.id, e.target.value, "manual")
                   }
                   rows={3}
-                  className="w-full rounded-xl border border-saathi-sand bg-white px-4 py-2.5 text-sm text-saathi-ink outline-none transition focus:border-saathi-forest focus:ring-1 focus:ring-saathi-mint"
+                  className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
                 />
               ) : (
                 <input
@@ -698,7 +698,7 @@ export default function SchemeFormPage() {
                   onChange={(e) =>
                     setFieldValue(field.id, e.target.value, "manual")
                   }
-                  className="w-full rounded-xl border border-saathi-sand bg-white px-4 py-2.5 text-sm text-saathi-ink outline-none transition focus:border-saathi-forest focus:ring-1 focus:ring-saathi-mint"
+                  className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
                 />
               )}
             </div>
@@ -707,20 +707,20 @@ export default function SchemeFormPage() {
 
         {/* Required documents */}
         <div className="mt-8">
-          <h2 className="text-sm font-semibold text-saathi-ink">
+          <h2 className="text-sm font-semibold text-bharatlink-navy">
             {t("scheme.requiredDocuments")}
           </h2>
           <ul className="mt-2 space-y-1.5">
             {scheme.requiredDocuments.map((doc) => (
               <li
                 key={doc}
-                className="flex items-center gap-2 text-xs text-saathi-ink/60"
+                className="flex items-center gap-2 text-xs text-bharatlink-navy/60"
               >
                 <DocIcon />
                 {doc}
                 <Link
                   href="/documents"
-                  className="ml-auto text-saathi-forest hover:underline"
+                  className="ml-auto text-bharatlink-tealDark hover:underline"
                 >
                   {getUiText(language, "Upload")}
                 </Link>
@@ -734,14 +734,14 @@ export default function SchemeFormPage() {
           <button
             type="button"
             onClick={openPortal}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-saathi-forest py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-bharatlink-tealDark py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
           >
             <ExternalLinkIcon />
             {t("scheme.openPortal")}
           </button>
           <Link
             href="/eligibility"
-            className="flex items-center justify-center rounded-full border border-saathi-sand px-6 py-3 text-sm font-medium text-saathi-ink hover:bg-white"
+            className="flex items-center justify-center rounded-full border border-bharatlink-sand px-6 py-3 text-sm font-medium text-bharatlink-navy hover:bg-white"
           >
             {getUiText(language, "Back")}
           </Link>
@@ -844,7 +844,7 @@ function MicIcon() {
 function DocIcon() {
   return (
     <svg
-      className="h-4 w-4 text-saathi-forest"
+      className="h-4 w-4 text-bharatlink-tealDark"
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}

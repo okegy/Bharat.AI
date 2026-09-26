@@ -1,6 +1,6 @@
 "use client";
 
-import { TopBar } from "@/components/formsaathi/TopBar";
+import { TopBar } from "@/components/BharatLink/TopBar";
 import { useAppLanguage } from "@/lib/app-language";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -169,10 +169,10 @@ export default function DocumentsPage() {
     <>
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 pb-24 pt-24 sm:px-6">
-        <h1 className="font-display text-3xl font-semibold text-saathi-ink sm:text-4xl">
+        <h1 className="font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
           {getUiText(language, "Document Vault")}
         </h1>
-        <p className="mt-1 text-sm text-saathi-ink/60">
+        <p className="mt-1 text-sm text-bharatlink-navy/60">
           {getUiText(
             language,
             "Capture and store documents on your device. Encrypted, never sent to any server.",
@@ -186,7 +186,7 @@ export default function DocumentsPage() {
               <select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
-                className="flex-1 rounded-xl border border-saathi-sand bg-white px-4 py-2.5 text-sm text-saathi-ink outline-none focus:border-saathi-forest"
+                className="flex-1 rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none focus:border-bharatlink-tealDark"
               >
                 {DOC_TYPES.map((dt) => (
                   <option key={dt.value} value={dt.value}>
@@ -197,7 +197,7 @@ export default function DocumentsPage() {
               <button
                 type="button"
                 onClick={() => void startCamera()}
-                className="flex items-center gap-2 rounded-full bg-saathi-forest px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+                className="flex items-center gap-2 rounded-full bg-bharatlink-tealDark px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -210,14 +210,14 @@ export default function DocumentsPage() {
             {/* Document list */}
             {loading ? (
               <div className="mt-12 flex justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
               </div>
             ) : docs.length === 0 ? (
-              <div className="mt-12 rounded-2xl border border-dashed border-saathi-sand bg-white p-8 text-center">
-                <p className="text-saathi-ink/50">
+              <div className="mt-12 rounded-2xl border border-dashed border-bharatlink-sand bg-white p-8 text-center">
+                <p className="text-bharatlink-navy/50">
                   {getUiText(language, "No documents captured yet.")}
                 </p>
-                <p className="mt-1 text-xs text-saathi-ink/40">
+                <p className="mt-1 text-xs text-bharatlink-navy/40">
                   {getUiText(language, "Use the camera button above to scan a document.")}
                 </p>
               </div>
@@ -226,17 +226,17 @@ export default function DocumentsPage() {
                 {docs.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center gap-4 rounded-2xl border border-saathi-sand bg-white p-4"
+                    className="flex items-center gap-4 rounded-2xl border border-bharatlink-sand bg-white p-4"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={doc.imageData}
                       alt={doc.label}
-                      className="h-16 w-24 rounded-lg border border-saathi-sand object-cover"
+                      className="h-16 w-24 rounded-lg border border-bharatlink-sand object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-saathi-ink">{doc.label}</p>
-                      <p className="text-xs text-saathi-ink/50">
+                      <p className="truncate text-sm font-semibold text-bharatlink-navy">{doc.label}</p>
+                      <p className="text-xs text-bharatlink-navy/50">
                         {getDocumentMetaText(
                           language,
                           new Date(doc.capturedAt).toLocaleDateString(locale),
@@ -257,7 +257,7 @@ export default function DocumentsPage() {
             )}
 
             <div className="mt-8">
-              <Link href="/dashboard" className="text-sm font-medium text-saathi-forest underline-offset-4 hover:underline">
+              <Link href="/dashboard" className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline">
                 {`← ${getUiText(language, "Dashboard")}`}
               </Link>
             </div>
@@ -265,7 +265,7 @@ export default function DocumentsPage() {
         )}
 
         {state === "camera" && (
-          <div className="relative mt-6 overflow-hidden rounded-2xl border-2 border-dashed border-saathi-forest/30 bg-black">
+          <div className="relative mt-6 overflow-hidden rounded-2xl border-2 border-dashed border-bharatlink-tealDark/30 bg-black">
             <video ref={videoRef} className="w-full" autoPlay playsInline muted />
             {/* Framing overlay */}
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -283,7 +283,7 @@ export default function DocumentsPage() {
                 onClick={capture}
                 className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-105"
               >
-                <div className="h-12 w-12 rounded-full border-4 border-saathi-forest" />
+                <div className="h-12 w-12 rounded-full border-4 border-bharatlink-tealDark" />
               </button>
               <button
                 type="button"
@@ -303,14 +303,14 @@ export default function DocumentsPage() {
             <img
               src={capturedImage}
               alt={t("documents.capturedDocument")}
-              className="w-full rounded-2xl border border-saathi-sand"
+              className="w-full rounded-2xl border border-bharatlink-sand"
             />
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <p className="text-sm font-medium text-saathi-ink">
+                <p className="text-sm font-medium text-bharatlink-navy">
                   {getUiText(language, "Quality:")} {quality}%
                 </p>
-                <div className="mt-1 h-2 overflow-hidden rounded-full bg-saathi-sand">
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-bharatlink-sand">
                   <div
                     className={`h-full rounded-full transition-all ${
                       quality >= 70 ? "bg-green-500" : quality >= 40 ? "bg-amber-500" : "bg-red-500"
@@ -333,14 +333,14 @@ export default function DocumentsPage() {
               <button
                 type="button"
                 onClick={() => void saveAndReturn()}
-                className="flex-1 rounded-full bg-saathi-forest py-3 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+                className="flex-1 rounded-full bg-bharatlink-tealDark py-3 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
               >
                 {getUiText(language, "Save to vault")}
               </button>
               <button
                 type="button"
                 onClick={() => { setCapturedImage(""); void startCamera(); }}
-                className="rounded-full border border-saathi-sand px-5 py-3 text-sm font-medium text-saathi-ink hover:bg-white"
+                className="rounded-full border border-bharatlink-sand px-5 py-3 text-sm font-medium text-bharatlink-navy hover:bg-white"
               >
                 {getUiText(language, "Retake")}
               </button>
@@ -350,8 +350,8 @@ export default function DocumentsPage() {
 
         {state === "processing" && (
           <div className="mt-12 flex flex-col items-center gap-4">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
-            <p className="text-sm text-saathi-ink/60">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+            <p className="text-sm text-bharatlink-navy/60">
               {getUiText(language, "Encrypting & saving…")}
             </p>
           </div>

@@ -7,7 +7,7 @@
  * by design — no server backup.
  */
 
-const DB_NAME = "formsaathi_vault";
+const DB_NAME = "BharatLink_vault";
 const DB_VERSION = 1;
 
 const STORES = {
@@ -17,7 +17,7 @@ const STORES = {
   family: "family",
 } as const;
 
-const KEY_STORAGE = "formsaathi_vault_key";
+const KEY_STORAGE = "BharatLink_vault_key";
 
 export interface ProfileData {
   fullName?: string;

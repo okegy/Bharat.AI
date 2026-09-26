@@ -56,11 +56,11 @@ export function LanguageProvider({
 
     syncLanguage();
     window.addEventListener("storage", syncLanguage);
-    window.addEventListener("formsaathi:languagechange", syncLanguage);
+    window.addEventListener("BharatLink:languagechange", syncLanguage);
 
     return () => {
       window.removeEventListener("storage", syncLanguage);
-      window.removeEventListener("formsaathi:languagechange", syncLanguage);
+      window.removeEventListener("BharatLink:languagechange", syncLanguage);
     };
   }, [i18n]);
 

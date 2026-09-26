@@ -1,53 +1,5 @@
 "use client";
 
-/* ─── Waveform bars component ─── */
-function WaveformBars({ active, color = "#14b8a6" }: { active: boolean; color?: string }) {
-  const heights = [0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.65];
-  return (
-    <div className="flex items-center gap-[3px] h-8">
-      {heights.map((h, i) => (
-        <span
-          key={i}
-          style={{
-            display: "block",
-            width: 3,
-            height: active ? `${h * 32}px` : "8px",
-            borderRadius: 4,
-            background: color,
-            opacity: active ? 1 : 0.3,
-            transition: `height ${0.15 + i * 0.03}s ease-in-out, opacity 0.3s`,
-            animation: active ? `waveBar ${0.8 + (i % 3) * 0.2}s ease-in-out infinite` : "none",
-            animationDelay: `${i * 0.08}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-type UIState = "idle" | "listening" | "thinking" | "speaking";
-
-/* ─── Status ring around mic button ─── */
-function MicRing({ state }: { state: UIState }) {
-  const colors: Record<UIState, string> = {
-    idle: "rgba(15,118,110,0.15)",
-    listening: "rgba(239,68,68,0.25)",
-    thinking: "rgba(234,88,12,0.2)",
-    speaking: "rgba(20,184,166,0.25)",
-  };
-  return (
-    <span
-      className="absolute inset-0 rounded-full"
-      style={{
-        background: colors[state],
-        animation: state !== "idle" ? "pulsebar 1.2s ease-in-out infinite" : "none",
-        transform: "scale(1.35)",
-        pointerEvents: "none",
-      }}
-    />
-  );
-}
-
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppLanguage } from "@/lib/app-language";
@@ -84,7 +36,7 @@ interface UIMessage {
   timestamp: number;
 }
 
-// UIState is declared at the top of the file
+type UIState = "idle" | "listening" | "thinking" | "speaking";
 
 export default function AssistantPage() {
   const { language } = useAppLanguage();
@@ -722,89 +674,49 @@ export default function AssistantPage() {
     e.target.value = "";
   }
 
-  // ─── State label + mic gradient ─────────────────────
-
-  const stateLabel = {
-    idle: "Ready to help",
-    listening: "Listening…",
-    thinking: "Thinking…",
-    speaking: "Speaking…",
-  }[uiState];
-
-  const micBg = {
-    idle: "linear-gradient(135deg, #0f766e, #14b8a6)",
-    listening: "linear-gradient(135deg, #dc2626, #ef4444)",
-    thinking: "linear-gradient(135deg, #ea580c, #f97316)",
-    speaking: "linear-gradient(135deg, #0d9488, #14b8a6)",
-  }[uiState];
-
   // ─── Render ───────────────────────────────────────────
 
   return (
-    <main className="mx-auto flex h-screen max-w-2xl flex-col" style={{ background: "var(--bl-cream)" }}>
-      {/* ── Gradient Header ── */}
-      <header
-        className="relative flex items-center gap-3 px-4 py-3 shadow-sm"
-        style={{ background: "linear-gradient(135deg, #0f766e 0%, #0f172a 100%)" }}
-      >
-        <Link
-          href="/dashboard"
-          className="flex h-9 w-9 items-center justify-center rounded-full transition"
-          style={{ background: "rgba(255,255,255,0.12)" }}
-        >
-          <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+    <main className="mx-auto flex h-screen max-w-2xl flex-col">
+      {/* Header */}
+      <header className="flex items-center gap-3 border-b border-bharatlink-sand px-4 py-3">
+        <Link href="/dashboard" className="text-bharatlink-tealDark hover:underline">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </Link>
         <div className="flex-1">
-          <h1 className="font-display text-lg font-bold text-white tracking-tight">BharatLink</h1>
-          <div className="flex items-center gap-2">
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{
-                background: uiState === "idle" ? "#4ade80" : uiState === "listening" ? "#ef4444" : "#f97316",
-                animation: uiState !== "idle" ? "pulsebar 1s ease-in-out infinite" : "none",
-              }}
-            />
-            <p className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>{stateLabel}</p>
-          </div>
+          <h1 className="font-display text-lg font-semibold text-bharatlink-navy">BharatLink</h1>
+          <p className="text-xs text-bharatlink-navy/50">
+            {uiState === "listening" ? "Listening..."
+              : uiState === "thinking" ? "Thinking..."
+              : uiState === "speaking" ? "Speaking..."
+              : "Ready to help"}
+          </p>
         </div>
-        {(uiState === "listening" || uiState === "speaking") && (
-          <WaveformBars active color={uiState === "listening" ? "#ef4444" : "#4ade80"} />
-        )}
         {screenShareActive && (
-          <span
-            className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white"
-            style={{ background: "rgba(239,68,68,0.3)", border: "1px solid rgba(239,68,68,0.5)" }}
-          >
-            <span className="h-2 w-2 animate-pulse rounded-full bg-red-400" />
-            Screen
+          <span className="flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+            Screen sharing
           </span>
         )}
       </header>
 
-      {/* ── Chat messages ── */}
+      {/* Chat messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {uiMessages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            {msg.role === "assistant" && (
-              <div
-                className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
-                style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
-              >
-                BL
-              </div>
-            )}
-            <div
-              className="max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm"
-              style={
-                msg.role === "user"
-                  ? { background: "linear-gradient(135deg, #0f766e, #0f172a)", color: "#fff", borderBottomRightRadius: 4 }
-                  : { background: "rgba(255,255,255,0.92)", border: "1px solid rgba(20,184,166,0.2)", color: "#0f172a", borderBottomLeftRadius: 4 }
-              }
-            >
+            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-base leading-relaxed ${
+              msg.role === "user"
+                ? "bg-bharatlink-tealDark text-white rounded-br-md"
+                : "bg-bharatlink-tealLight/30 text-bharatlink-navy rounded-bl-md"
+            }`}>
               {msg.imageUrl && (
-                <img src={msg.imageUrl} alt="Screenshot" className="mb-2 rounded-xl max-h-48 w-auto" style={{ border: "1px solid rgba(255,255,255,0.2)" }} />
+                <img
+                  src={msg.imageUrl}
+                  alt="Screenshot"
+                  className="mb-2 rounded-xl max-h-48 w-auto border border-white/20"
+                />
               )}
               {msg.portalUrl && (
                 <a
@@ -813,13 +725,16 @@ export default function AssistantPage() {
                   rel="noopener noreferrer"
                   onClick={() => {
                     if (!screenShareActive) {
-                      setTimeout(() => { setPhase("online-guide"); phaseRef.current = "online-guide"; startScreenShare(); }, 2000);
+                      setTimeout(() => {
+                        setPhase("online-guide");
+                        phaseRef.current = "online-guide";
+                        startScreenShare();
+                      }, 2000);
                     }
                   }}
-                  className="mb-2 flex items-center gap-2 rounded-xl px-4 py-3 text-white text-sm font-semibold shadow-md transition hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+                  className="mb-2 flex items-center gap-2 rounded-xl bg-bharatlink-tealDark px-4 py-3 text-white text-sm font-semibold shadow-md hover:bg-bharatlink-navy transition"
                 >
-                  <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                   </svg>
                   Open Portal →
@@ -830,18 +745,17 @@ export default function AssistantPage() {
                 <a
                   href={msg.formDownload.path}
                   download
-                  className="mt-2 flex items-center gap-3 rounded-xl p-3 transition hover:shadow-md"
-                  style={{ border: "1px solid rgba(15,118,110,0.2)", background: "#f0fdfc" }}
+                  className="mb-2 flex items-center gap-3 rounded-xl border-2 border-bharatlink-tealDark/20 bg-white p-4 shadow-sm hover:border-bharatlink-tealDark hover:shadow-md transition"
                 >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate" style={{ color: "#0f172a" }}>{msg.formDownload.nameHi}</p>
-                    <p className="text-xs truncate" style={{ color: "rgba(15,23,42,0.5)" }}>{msg.formDownload.name}</p>
-                    <p className="text-[10px] font-medium mt-0.5" style={{ color: "#0f766e" }}>Download PDF ↓</p>
+                    <p className="text-sm font-semibold text-bharatlink-navy truncate">{msg.formDownload.nameHi}</p>
+                    <p className="text-xs text-bharatlink-navy/60 truncate">{msg.formDownload.name}</p>
+                    <p className="text-[10px] text-bharatlink-tealDark font-medium mt-0.5">PDF — {t("common.download", { defaultValue: "Download" })} ↓</p>
                   </div>
                 </a>
               )}
@@ -849,39 +763,39 @@ export default function AssistantPage() {
                 <a
                   href={`data:application/pdf;base64,${msg.pdfDownload.base64}`}
                   download={msg.pdfDownload.filename}
-                  className="mt-2 flex items-center gap-3 rounded-xl p-3 text-white transition hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg, #0f766e, #0d9488)" }}
+                  className="mb-2 flex items-center gap-3 rounded-xl bg-bharatlink-tealDark p-4 text-white shadow-md hover:bg-bharatlink-navy transition"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold">Download PDF</p>
+                    <p className="text-sm font-semibold">{t("common.download", { defaultValue: "Download PDF" })}</p>
                     <p className="text-xs text-white/70">{msg.pdfDownload.filename}</p>
                   </div>
                 </a>
               )}
               {msg.showUploadCard && (
-                <label
-                  className="mt-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition"
-                  style={{ border: "2px dashed rgba(15,118,110,0.3)", background: "rgba(255,255,255,0.6)" }}
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "rgba(15,118,110,0.1)", color: "#0f766e" }}>
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <label className="mt-3 flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-bharatlink-tealDark/30 bg-white/60 p-4 transition hover:border-bharatlink-tealDark hover:bg-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-bharatlink-tealDark/10 text-bharatlink-tealDark">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: "#0f766e" }}>Upload Form</p>
-                    <p className="text-xs" style={{ color: "rgba(15,23,42,0.5)" }}>PDF, JPG, PNG</p>
+                    <p className="text-sm font-semibold text-bharatlink-tealDark">
+                      {t("common.upload", { defaultValue: "Upload" })}
+                    </p>
+                    <p className="text-xs text-bharatlink-navy/50">PDF, JPG, PNG</p>
                   </div>
                   <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileUpload} />
                 </label>
               )}
               {msg.toolsUsed && msg.toolsUsed.length > 0 && (
-                <p className="mt-2 text-[10px] opacity-40">{msg.toolsUsed.map(formatToolName).join(" · ")}</p>
+                <p className="mt-2 text-xs opacity-50">
+                  {msg.toolsUsed.map(formatToolName).join(" · ")}
+                </p>
               )}
             </div>
           </div>
@@ -895,21 +809,11 @@ export default function AssistantPage() {
         )}
         {uiState === "thinking" && (
           <div className="flex justify-start">
-            <div
-              className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-              style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
-            >
-              BL
-            </div>
-            <div
-              className="rounded-2xl px-4 py-3"
-              style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(20,184,166,0.2)", borderBottomLeftRadius: 4 }}
-            >
-              <div className="flex gap-1.5 items-center">
-                {[0, 150, 300].map((delay) => (
-                  <span key={delay} className="h-2 w-2 rounded-full"
-                    style={{ background: "#14b8a6", animation: "waveBar 1s ease-in-out infinite", animationDelay: `${delay}ms` }} />
-                ))}
+            <div className="rounded-2xl rounded-bl-md bg-bharatlink-tealLight/30 px-4 py-3">
+              <div className="flex gap-1">
+                <span className="h-2 w-2 animate-bounce rounded-full bg-bharatlink-tealDark/60" style={{ animationDelay: "0ms" }} />
+                <span className="h-2 w-2 animate-bounce rounded-full bg-bharatlink-tealDark/60" style={{ animationDelay: "150ms" }} />
+                <span className="h-2 w-2 animate-bounce rounded-full bg-bharatlink-tealDark/60" style={{ animationDelay: "300ms" }} />
               </div>
             </div>
           </div>
@@ -917,35 +821,47 @@ export default function AssistantPage() {
         <div ref={chatEndRef} />
       </div>
 
-      {/* ── Quick PDF bar ── */}
+      {/* Quick PDF download bar — shows whenever form fields exist (any stage) */}
       {filledFormFields && (phase === "offline-scan" || phase === "offline-fill" || phase === "offline-generate") && (
-        <div className="flex items-center gap-3 px-4 py-3" style={{ borderTop: "1px solid rgba(20,184,166,0.2)", background: "#f0fdfa" }}>
+        <div className="border-t border-bharatlink-tealDark/20 bg-bharatlink-tealLight/20 px-4 py-3 flex items-center gap-3">
           <div className="flex-1">
-            <p className="text-sm font-semibold" style={{ color: "#0f766e" }}>Form ready</p>
-            <p className="text-xs" style={{ color: "rgba(15,23,42,0.5)" }}>{Object.keys(filledFormFields).length} fields filled</p>
+            <p className="text-sm font-semibold text-bharatlink-tealDark">
+              {t("scheme.formReady", { defaultValue: "Form ready" })}
+            </p>
+            <p className="text-xs text-bharatlink-navy/50">
+              {Object.keys(filledFormFields).length} {t("scheme.fieldsFilled", { defaultValue: "fields filled" })}
+            </p>
           </div>
           <button
             type="button"
             onClick={async () => {
               try {
+                // Merge profile data with agent-filled fields for maximum coverage
                 const mergedFields = { ...profileRef.current, ...filledFormFields };
                 const res = await fetch("/api/agent/fill-pdf", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ formImage: uploadedFormImageRef.current || undefined, filledFields: mergedFields, title: "PM-KISAN Application — BharatLink" }),
+                  body: JSON.stringify({
+                    formImage: uploadedFormImageRef.current || undefined,
+                    filledFields: mergedFields,
+                    title: "PM-KISAN Application — BharatLink",
+                  }),
                 });
                 if (!res.ok) throw new Error("Failed");
                 const data = await res.json();
                 downloadPdf(data.pdf, data.filename);
                 msgCounter.current += 1;
-                setUiMessages((prev) => [...prev, { id: `msg-${msgCounter.current}`, role: "assistant", text: "", pdfDownload: { base64: data.pdf, filename: data.filename }, timestamp: Date.now() }]);
-                setPhase("complete"); phaseRef.current = "complete";
+                setUiMessages((prev) => [...prev, {
+                  id: `msg-${msgCounter.current}`, role: "assistant", text: "",
+                  pdfDownload: { base64: data.pdf, filename: data.filename }, timestamp: Date.now(),
+                }]);
+                setPhase("complete");
+                phaseRef.current = "complete";
               } catch { setError("PDF generation failed"); }
             }}
-            className="rounded-full px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
-            style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+            className="rounded-full bg-bharatlink-tealDark px-5 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-bharatlink-navy transition"
           >
-            Download PDF ↓
+            {t("common.download", { defaultValue: "Download PDF" })} ↓
           </button>
         </div>
       )}
@@ -962,132 +878,131 @@ export default function AssistantPage() {
         </div>
       )}
 
-      {/* ── Error banner ── */}
+      {/* Error banner */}
       {error && (
-        <div className="mx-4 mb-2 rounded-xl px-4 py-2" style={{ border: "1px solid rgba(239,68,68,0.3)", background: "rgba(254,242,242,0.9)" }}>
-          <p className="text-xs" style={{ color: "#b91c1c" }}>{error}</p>
+        <div className="mx-4 mb-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2">
+          <p className="text-xs text-red-700">{error}</p>
         </div>
       )}
 
-      {/* ── Screen share controls ── */}
+      {/* Screen share controls */}
       {screenShareActive && (
-        <div className="flex items-center gap-2 px-4 py-2" style={{ borderTop: "1px solid rgba(234,88,12,0.2)", background: "rgba(255,247,237,0.9)" }}>
-          <button type="button" onClick={toggleAutoCapture}
-            className="rounded-full px-3 py-1 text-xs font-medium transition"
-            style={screenAutoCapture ? { background: "rgba(234,88,12,0.15)", color: "#c2410c" } : { background: "rgba(0,0,0,0.06)", color: "#64748b" }}>
+        <div className="flex items-center gap-2 border-t border-bharatlink-sand px-4 py-2 bg-amber-50">
+          <button type="button" onClick={toggleAutoCapture} className={`rounded-full px-3 py-1 text-xs font-medium ${screenAutoCapture ? "bg-amber-200 text-amber-800" : "bg-gray-200 text-gray-700"}`}>
             {screenAutoCapture ? "Auto-capture ON" : "Auto-capture OFF"}
           </button>
           {!screenAutoCapture && (
-            <button type="button" onClick={() => captureScreenFrame()}
-              className="rounded-full px-3 py-1 text-xs font-medium text-white transition hover:opacity-90"
-              style={{ background: "#0f766e" }}>
+            <button type="button" onClick={() => captureScreenFrame()} className="rounded-full bg-bharatlink-tealDark px-3 py-1 text-xs font-medium text-white">
               What should I do?
             </button>
           )}
-          <button type="button" onClick={stopScreenShare}
-            className="ml-auto rounded-full px-3 py-1 text-xs font-medium transition"
-            style={{ background: "rgba(239,68,68,0.1)", color: "#dc2626" }}>
+          <button type="button" onClick={stopScreenShare} className="ml-auto rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
             Stop sharing
           </button>
         </div>
       )}
 
-      {/* ── Input bar ── */}
-      <div className="px-4 pt-3 pb-5" style={{ borderTop: "1px solid rgba(20,184,166,0.15)", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)" }}>
-        {/* Tool row + big centered mic */}
-        <div className="flex items-center justify-center gap-4">
-
-          {/* Upload */}
+      {/* Input bar — voice-first layout */}
+      <div className="border-t border-bharatlink-sand px-4 pt-3 pb-4">
+        {/* Main row: tools on sides, BIG mic button centered */}
+        <div className="flex items-center justify-center gap-3">
+          {/* Left tools — icon + label */}
           <div className="flex flex-col items-center gap-1">
-            <label className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full transition hover:scale-105" style={{ background: "var(--bl-sand)", color: "rgba(15,23,42,0.5)" }}>
+            <label className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-bharatlink-sand/50 text-bharatlink-navy/50 hover:bg-bharatlink-sand transition">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
               </svg>
               <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileUpload} />
             </label>
-            <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.45)" }}>Upload</span>
+            <span className="text-[11px] text-bharatlink-navy/60 font-medium">{t("common.upload", { defaultValue: "Upload" })}</span>
           </div>
-
-          {/* Scan */}
           <div className="flex flex-col items-center gap-1">
-            <button type="button" onClick={() => { setCameraPurpose("form_scan"); openCamera(); }}
-              className="flex h-11 w-11 items-center justify-center rounded-full transition hover:scale-105"
-              style={{ background: "var(--bl-sand)", color: "rgba(15,23,42,0.5)" }}>
+            <button type="button" onClick={() => { setCameraPurpose("form_scan"); openCamera(); }} className="flex h-10 w-10 items-center justify-center rounded-full bg-bharatlink-sand/50 text-bharatlink-navy/50 hover:bg-bharatlink-sand transition">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
               </svg>
             </button>
-            <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.45)" }}>Scan</span>
+            <span className="text-[11px] text-bharatlink-navy/60 font-medium">{t("documents.capture", { defaultValue: "Scan" })}</span>
           </div>
 
-          {/* ── BIG MIC BUTTON ── */}
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="relative">
-              <MicRing state={uiState} />
-              <button
-                type="button"
-                id="mic-button"
-                onClick={toggleMic}
-                disabled={uiState === "thinking" || !isSTTAvailable()}
-                className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full shadow-xl transition-all hover:scale-105 disabled:opacity-40"
-                style={{ background: micBg }}
-              >
-                {uiState === "listening" ? (
-                  <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" /></svg>
-                ) : uiState === "speaking" ? (
-                  <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
-                ) : uiState === "thinking" ? (
-                  <svg className="h-7 w-7 text-white animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                ) : (
-                  <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" /></svg>
-                )}
-              </button>
-            </div>
-            <span className="text-[10px] font-semibold" style={{ color: "#0f766e" }}>
-              {uiState === "listening" ? "Tap to stop" : uiState === "speaking" ? "Tap to interrupt" : "Speak"}
-            </span>
-          </div>
-
-          {/* Screen share */}
+          {/* CENTER: Big mic button */}
           <div className="flex flex-col items-center gap-1">
-            <button type="button"
-              onClick={screenShareActive ? stopScreenShare : startScreenShare}
-              className="flex h-11 w-11 items-center justify-center rounded-full transition hover:scale-105"
-              style={screenShareActive ? { background: "rgba(239,68,68,0.12)", color: "#dc2626" } : { background: "var(--bl-sand)", color: "rgba(15,23,42,0.5)" }}
+            <button
+              type="button"
+              onClick={toggleMic}
+              disabled={uiState === "thinking" || !isSTTAvailable()}
+              className={`flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-all ${
+                uiState === "listening"
+                  ? "animate-pulse bg-red-500 text-white shadow-red-500/40 scale-110"
+                  : uiState === "speaking"
+                    ? "bg-amber-400 text-white shadow-amber-400/30"
+                    : "bg-bharatlink-tealDark text-white hover:bg-bharatlink-navy hover:scale-105 shadow-bharatlink-tealDark/30"
+              } disabled:opacity-40`}
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-              </svg>
+              {uiState === "listening" ? (
+                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" /></svg>
+              ) : uiState === "speaking" ? (
+                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+              ) : (
+                <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" /></svg>
+              )}
             </button>
-            <span className="text-[10px] font-medium" style={{ color: screenShareActive ? "#dc2626" : "rgba(15,23,42,0.45)" }}>
-              {screenShareActive ? "Stop" : "Screen"}
-            </span>
+            <span className="text-[11px] text-bharatlink-navy/60 font-medium">{t("common.voice", { defaultValue: "Speak" })}</span>
           </div>
 
-          {/* Spacer for symmetry */}
-          <div className="w-11" />
+          {/* Right tools — icon + label */}
+          <div className="flex flex-col items-center gap-1">
+            {!screenShareActive ? (
+              <button type="button" onClick={startScreenShare} className="flex h-10 w-10 items-center justify-center rounded-full bg-bharatlink-sand/50 text-bharatlink-navy/50 hover:bg-bharatlink-sand transition">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                </svg>
+              </button>
+            ) : (
+              <button type="button" onClick={stopScreenShare} className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                </svg>
+              </button>
+            )}
+            <span className="text-[11px] text-bharatlink-navy/60 font-medium">
+              {screenShareActive
+                ? t("common.stop", { defaultValue: "Stop" })
+                : t("common.screen", { defaultValue: "Screen" })}
+            </span>
+          </div>
         </div>
 
-        {/* Text input */}
-        <div className="mt-3 flex items-center gap-2">
+        {/* Mic hint / tooltip */}
+        <p className={`mt-2 text-center text-xs transition-all ${
+          uiState === "idle" && uiMessages.length > 1
+            ? "text-bharatlink-tealDark font-medium animate-pulse"
+            : "text-bharatlink-navy/50"
+        }`}>
+          {uiState === "listening"
+            ? "Listening... tap to stop"
+            : uiState === "thinking"
+              ? "Processing..."
+              : uiState === "speaking"
+                ? "Speaking... tap to interrupt"
+                : uiMessages.length > 1
+                  ? "↑ Click mic to continue the conversation"
+                  : "Tap the mic to start speaking"}
+        </p>
+
+        {/* Collapsed text input — tap to expand */}
+        <div className="mt-2 flex items-center gap-1.5">
           <input
             type="text" value={textInput} onChange={(e) => setTextInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleTextSubmit(); }}
-            placeholder="or type here…"
-            className="flex-1 rounded-full px-4 py-2 text-sm outline-none transition"
-            style={{ background: "rgba(15,23,42,0.05)", border: "1px solid rgba(20,184,166,0.2)", color: "#0f172a" }}
+            placeholder="or type here..."
+            className="flex-1 rounded-full border border-transparent bg-bharatlink-sand/30 px-3 py-1.5 text-xs text-bharatlink-navy/50 outline-none transition focus:border-bharatlink-tealDark/40 focus:bg-white focus:text-bharatlink-navy focus:text-sm focus:py-2 focus:px-4"
             disabled={uiState === "thinking"}
           />
           {textInput.trim() && (
-            <button type="button" onClick={handleTextSubmit} disabled={uiState === "thinking"}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-md transition hover:scale-105 disabled:opacity-40"
-              style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
-            >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+            <button type="button" onClick={handleTextSubmit} disabled={uiState === "thinking"} className="flex h-6 w-6 items-center justify-center rounded-full bg-bharatlink-tealDark text-white transition hover:bg-bharatlink-navy disabled:opacity-40">
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
               </svg>
             </button>

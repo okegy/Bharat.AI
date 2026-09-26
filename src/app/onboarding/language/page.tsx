@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -20,7 +19,6 @@ import { useTranslation } from "react-i18next";
 import { speak, stopSpeaking } from "@/lib/speech-engine";
 
 export default function LanguageOnboardingPage() {
-  const { user, isLoaded } = useUser();
   const router = useRouter();
   const { language } = useAppLanguage();
   const { t } = useTranslation();
@@ -28,11 +26,11 @@ export default function LanguageOnboardingPage() {
   // Auto-speak: "Choose your language" (once)
   const hasSpoken = useRef(false);
   useEffect(() => {
-    if (!isLoaded || !user || hasSpoken.current) return;
+    if (hasSpoken.current) return;
     hasSpoken.current = true;
     speak(getUiText(language, "Choose your language"), language);
     return () => stopSpeaking();
-  }, [isLoaded, user, language]);
+  }, [language]);
   const [current, setCurrent] = useState<IndianLanguageCode | null>(null);
   /**
    * User opened this screen via “Language” (repick). After we clear the session
@@ -42,8 +40,7 @@ export default function LanguageOnboardingPage() {
   const repickSessionRef = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded) return;
-
+    
     const repick =
       typeof window !== "undefined" &&
       sessionStorage.getItem(SESSION_LANGUAGE_REPICK) === "1";
@@ -66,7 +63,7 @@ export default function LanguageOnboardingPage() {
     }
     // Intentionally omit `router`: a new reference re-ran this effect and caused bogus redirects.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- stable navigation; avoid effect loops
-  }, [isLoaded]);
+  }, []);
 
   const choose = useCallback(
     (code: IndianLanguageCode) => {
@@ -82,30 +79,18 @@ export default function LanguageOnboardingPage() {
     [router],
   );
 
-  if (!isLoaded) {
-    return (
-      <main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-4 pb-24 pt-28 sm:px-6">
-        <p className="text-center text-saathi-ink/60">
-          {getUiText(language, "Loading…")}
-        </p>
-      </main>
-    );
-  }
 
-  if (!user) {
-    return null;
-  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 pb-24 pt-28 sm:px-6">
       <div className="mb-10 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-saathi-forest">
+        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
           {getUiText(language, "Step 2 of 3")}
         </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold text-saathi-ink sm:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
           {getUiText(language, "Choose your language")}
         </h1>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-saathi-ink/70">
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-bharatlink-navy/70">
           {t("onboarding.signInSubtext")}{" "}
           {getUiText(language, "The app uses this language for screens and voice.")}
         </p>
@@ -119,16 +104,16 @@ export default function LanguageOnboardingPage() {
               <button
                 type="button"
                 onClick={() => choose(lang.code)}
-                className={`flex w-full flex-col items-center rounded-2xl border px-4 py-5 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saathi-forest ${
+                className={`flex w-full flex-col items-center rounded-2xl border px-4 py-5 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bharatlink-tealDark ${
                   active
-                    ? "border-saathi-forest bg-white shadow-md ring-1 ring-saathi-mint/50"
-                    : "border-saathi-sand bg-saathi-cream/40 hover:border-saathi-mint/70 hover:bg-white"
+                    ? "border-bharatlink-tealDark bg-white shadow-md ring-1 ring-bharatlink-tealLight/50"
+                    : "border-bharatlink-sand bg-bharatlink-cream/40 hover:border-bharatlink-tealLight/70 hover:bg-white"
                 }`}
               >
-                <span className="text-lg font-semibold text-saathi-ink">
+                <span className="text-lg font-semibold text-bharatlink-navy">
                   {lang.script}
                 </span>
-                <span className="mt-1 text-xs text-saathi-ink/50">
+                <span className="mt-1 text-xs text-bharatlink-navy/50">
                   {lang.label}
                 </span>
               </button>
@@ -137,16 +122,16 @@ export default function LanguageOnboardingPage() {
         })}
       </ul>
 
-      <p className="mt-10 text-center text-xs text-saathi-ink/45">
+      <p className="mt-10 text-center text-xs text-bharatlink-navy/45">
         {getUiText(
           language,
-          "Next in onboarding: WebAuthn fingerprint on this device (optional skip), then your FormSaathi home.",
+          "Next in onboarding: WebAuthn fingerprint on this device (optional skip), then your BharatLink home.",
         )}
       </p>
 
       <Link
         href="/"
-        className="mt-6 text-center text-sm font-medium text-saathi-forest underline-offset-4 hover:underline"
+        className="mt-6 text-center text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
       >
         {`← ${getUiText(language, "Back to home")}`}
       </Link>

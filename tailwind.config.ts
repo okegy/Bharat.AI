@@ -9,14 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        saathi: {
-          ink: "#0c1f1a",
-          forest: "#14532d",
-          leaf: "#22c55e",
-          mint: "#a7f3d0",
-          cream: "#f7f5f0",
-          sand: "#e8e4dc",
-          sky: "#0ea5e9",
+        bharatlink: {
+          navy: "#0f172a",
+          tealDark: "#0f766e",
+          teal: "#14b8a6",
+          tealLight: "#ccfbf1",
+          terracotta: "#ea580c",
+          cream: "#fdfbf7",
+          sand: "#f3ede4",
         },
       },
       fontFamily: {
@@ -25,20 +25,30 @@ const config: Config = {
       },
       backgroundImage: {
         "hero-mesh":
-          "radial-gradient(ellipse 120% 80% at 50% -20%, rgba(34,197,94,0.25), transparent 55%), radial-gradient(ellipse 60% 50% at 100% 0%, rgba(14,165,233,0.12), transparent 50%)",
+          "radial-gradient(ellipse 110% 70% at 55% -10%, rgba(20,184,166,0.18), transparent 55%), radial-gradient(ellipse 70% 55% at 100% 0%, rgba(234,88,12,0.10), transparent 55%)",
       },
       animation: {
-        float: "float 6s ease-in-out infinite",
+        float: "float 5s ease-in-out infinite",
         pulsebar: "pulsebar 1.2s ease-in-out infinite",
+        wave: "waveBar 1.0s ease-in-out infinite",
+        shimmer: "shimmer 1.5s infinite",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-6px)" },
+          "50%": { transform: "translateY(-8px)" },
         },
         pulsebar: {
-          "0%, 100%": { opacity: "0.35", transform: "scaleY(0.6)" },
+          "0%, 100%": { opacity: "0.35", transform: "scaleY(0.5)" },
           "50%": { opacity: "1", transform: "scaleY(1)" },
+        },
+        waveBar: {
+          "0%, 100%": { transform: "scaleY(0.4)", opacity: "0.45" },
+          "50%": { transform: "scaleY(1.0)", opacity: "1" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-400px 0" },
+          "100%": { backgroundPosition: "400px 0" },
         },
       },
     },

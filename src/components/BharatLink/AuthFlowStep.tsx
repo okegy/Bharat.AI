@@ -18,13 +18,13 @@ export function AuthFlowStep({
 
   return (
     <div className="mb-8 text-center">
-      <p className="text-xs font-semibold uppercase tracking-widest text-saathi-forest">
+      <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
         {getStepText(language, step, total)}
       </p>
-      <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-saathi-ink sm:text-3xl">
+      <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-bharatlink-navy sm:text-3xl">
         {title}
       </h1>
-      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-saathi-ink/70">
+      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-bharatlink-navy/70">
         {description}
       </p>
     </div>

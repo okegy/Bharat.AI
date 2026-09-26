@@ -1,8 +1,8 @@
 "use client";
 
-import { AuthFlowStep } from "@/components/formsaathi/AuthFlowStep";
+import { AuthFlowStep } from "@/components/BharatLink/AuthFlowStep";
 import { useAppLanguage } from "@/lib/app-language";
-import { formSaathiClerkAppearance } from "@/lib/clerk-auth-appearance";
+import { BharatLinkClerkAppearance } from "@/lib/clerk-auth-appearance";
 import { markExpectOnboardingAfterAuth } from "@/lib/auth-flow-flags";
 import { getUiText } from "@/lib/ui-text";
 import { SignIn } from "@clerk/nextjs";
@@ -19,7 +19,7 @@ export default function SignInPage() {
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-saathi-cream px-4 py-24">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-bharatlink-cream px-4 py-24">
       <div className="w-full max-w-md">
         <AuthFlowStep
           step={1}
@@ -29,7 +29,7 @@ export default function SignInPage() {
         <SignIn
           path="/sign-in"
           routing="path"
-          appearance={formSaathiClerkAppearance}
+          appearance={BharatLinkClerkAppearance}
           signUpUrl="/sign-up"
           forceRedirectUrl="/onboarding"
           fallbackRedirectUrl="/onboarding"
@@ -37,7 +37,7 @@ export default function SignInPage() {
       </div>
       <Link
         href="/"
-        className="mt-10 text-sm font-medium text-saathi-forest/80 underline-offset-4 hover:text-saathi-forest hover:underline"
+        className="mt-10 text-sm font-medium text-bharatlink-tealDark/80 underline-offset-4 hover:text-bharatlink-tealDark hover:underline"
       >
         {`← ${getUiText(language, "Back to home")}`}
       </Link>

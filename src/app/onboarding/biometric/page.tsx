@@ -3,8 +3,7 @@
 import { Trans, useTranslation } from "react-i18next";
 import "@/lib/i18n";
 
-import { BiometricSetupNavLink } from "@/components/formsaathi/BiometricSetupNavLink";
-import { useUser } from "@clerk/nextjs";
+import { BiometricSetupNavLink } from "@/components/BharatLink/BiometricSetupNavLink";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -28,7 +27,6 @@ type BiometricSupport = "loading" | "full" | "webauthn-only" | "none";
 
 export default function BiometricOnboardingPage() {
   const { t } = useTranslation();
-  const { user, isLoaded } = useUser();
   const router = useRouter();
   const { language } = useAppLanguage();
   const [busy, setBusy] = useState(false);
@@ -55,7 +53,7 @@ export default function BiometricOnboardingPage() {
   // Auto-speak the page content
   const hasSpoken = useRef(false);
   useEffect(() => {
-    if (support === "loading" || !isLoaded || hasSpoken.current) return;
+    if (support === "loading" || hasSpoken.current) return;
     hasSpoken.current = true;
     const hasSensor = support === "full";
     const title = hasSensor
@@ -66,10 +64,10 @@ export default function BiometricOnboardingPage() {
       : t("biometric.setupSecurityKeyDescOnboarding");
     speak(`${title}. ${desc}`, language);
     return () => stopSpeaking();
-  }, [support, isLoaded, t, language]);
+  }, [support, t, language]);
 
   useEffect(() => {
-    if (!isLoaded || support === "loading") return;
+    if (support === "loading") return;
 
     if (!isLanguageOnboardingComplete()) {
       router.replace("/onboarding/language");
@@ -98,23 +96,18 @@ export default function BiometricOnboardingPage() {
     completeRedirectRef.current = true;
     router.replace("/onboarding/aadhaar");
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `router` churn re-fired this effect and bounced users off the page
-  }, [isLoaded, settingsEntry, support]);
+  }, [settingsEntry, support]);
 
   const onRegister = useCallback(async () => {
-    if (!user) return;
     setError(null);
     setBusy(true);
     try {
-      const username =
-        user.primaryEmailAddress?.emailAddress ||
-        user.username ||
-        user.id;
-      const displayName =
-        [user.firstName, user.lastName].filter(Boolean).join(" ").trim() ||
-        username;
+      const userId = "anonymous-" + (typeof window !== "undefined" ? (localStorage.getItem("bl_anon_id") || (() => { const id = crypto.randomUUID(); localStorage.setItem("bl_anon_id", id); return id; })()) : "user");
+      const username = userId;
+      const displayName = "BharatLink User";
 
       await registerDevicePasskey({
-        userId: user.id,
+        userId,
         username,
         displayName,
       });
@@ -126,42 +119,38 @@ export default function BiometricOnboardingPage() {
     } finally {
       setBusy(false);
     }
-  }, [user, router, t]);
+  }, [router, t]);
 
   const onSkip = useCallback(() => {
     markPasskeySkipped();
     router.push("/onboarding/aadhaar");
   }, [router]);
 
-  if (!isLoaded || support === "loading") {
+  if (support === "loading") {
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center px-6 pb-24 pt-28">
-        <p className="text-center text-saathi-ink/60">{t("common.loading")}</p>
+        <p className="text-center text-bharatlink-navy/60">{t("common.loading")}</p>
       </main>
     );
-  }
-
-  if (!user) {
-    return null;
   }
 
   if (settingsEntry && support === "none") {
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 pb-24 pt-28">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-saathi-forest">
+          <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
             {t("biometric.thisDevice")}
           </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-saathi-ink sm:text-4xl">
+          <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
             {t("biometric.notAvailable")}
           </h1>
-          <p className="mt-4 text-lg leading-relaxed text-saathi-ink/75">
+          <p className="mt-4 text-lg leading-relaxed text-bharatlink-navy/75">
             {t("biometric.notAvailableDesc")}
           </p>
         </div>
         <Link
           href="/onboarding"
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-saathi-forest px-6 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
         >
           {t("biometric.backToOnboarding")}
         </Link>
@@ -173,19 +162,19 @@ export default function BiometricOnboardingPage() {
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 pb-24 pt-28">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-saathi-forest">
+          <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
             {t("biometric.thisDevice")}
           </p>
-          <h1 className="mt-2 font-display text-3xl font-semibold text-saathi-ink sm:text-4xl">
+          <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
             {t("biometric.alreadySetUp")}
           </h1>
-          <p className="mt-4 text-lg leading-relaxed text-saathi-ink/75">
+          <p className="mt-4 text-lg leading-relaxed text-bharatlink-navy/75">
             {t("biometric.alreadySetUpDesc")}
           </p>
         </div>
         <Link
           href="/onboarding"
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-saathi-forest px-6 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
         >
           {t("biometric.backToOnboarding")}
         </Link>
@@ -210,15 +199,15 @@ export default function BiometricOnboardingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 pb-24 pt-28">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-saathi-forest">
+        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
           {stepLabel}
         </p>
-        <h1 className="mt-2 font-display text-3xl font-semibold text-saathi-ink sm:text-4xl">
+        <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
           {hasSensor
             ? t("biometric.setupBiometric")
             : t("biometric.setupSecurityKey")}
         </h1>
-        <p className="mt-4 text-lg leading-relaxed text-saathi-ink/75">
+        <p className="mt-4 text-lg leading-relaxed text-bharatlink-navy/75">
           {description}
         </p>
       </div>
@@ -237,7 +226,7 @@ export default function BiometricOnboardingPage() {
           type="button"
           disabled={busy}
           onClick={() => void onRegister()}
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-saathi-forest px-6 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink disabled:opacity-50"
+          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy disabled:opacity-50"
         >
           {busy
             ? t("biometric.waitingForDevice")
@@ -249,7 +238,7 @@ export default function BiometricOnboardingPage() {
           type="button"
           disabled={busy}
           onClick={onSkip}
-          className="inline-flex h-12 items-center justify-center rounded-full border border-saathi-sand px-6 text-sm font-semibold text-saathi-ink hover:bg-white disabled:opacity-50"
+          className="inline-flex h-12 items-center justify-center rounded-full border border-bharatlink-sand px-6 text-sm font-semibold text-bharatlink-navy hover:bg-white disabled:opacity-50"
         >
           {settingsEntry
             ? t("biometric.notNowBack")
@@ -257,7 +246,7 @@ export default function BiometricOnboardingPage() {
         </button>
       </div>
 
-      <div className="text-xs leading-relaxed text-saathi-ink/50">
+      <div className="text-xs leading-relaxed text-bharatlink-navy/50">
         {hasSensor ? (
           <p>{t("biometric.biometricFinePrint")}</p>
         ) : (
@@ -268,7 +257,7 @@ export default function BiometricOnboardingPage() {
             i18nKey="biometric.fingerprintAnytime"
             components={{
               1: (
-                <BiometricSetupNavLink className="font-medium text-saathi-forest underline-offset-2 hover:underline">
+                <BiometricSetupNavLink className="font-medium text-bharatlink-tealDark underline-offset-2 hover:underline">
                   {t("nav.fingerprint")}
                 </BiometricSetupNavLink>
               ),
@@ -281,13 +270,13 @@ export default function BiometricOnboardingPage() {
         <Link
           href="/onboarding/language"
           onClick={() => markLanguagePickerRepick()}
-          className="text-sm font-medium text-saathi-forest underline-offset-4 hover:underline"
+          className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
         >
           {t("nav.changeLanguage")}
         </Link>
         <Link
           href="/"
-          className="text-sm font-medium text-saathi-forest underline-offset-4 hover:underline"
+          className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
         >
           {`← ${t("nav.backToHome")}`}
         </Link>

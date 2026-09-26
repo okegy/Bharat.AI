@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
@@ -13,7 +12,6 @@ import { useTranslation } from "react-i18next";
 type Step = "upload" | "scanning" | "review" | "filling" | "generating" | "done";
 
 export default function FormFillPage() {
-  const { isLoaded } = useUser();
   const { language } = useAppLanguage();
   const { t } = useTranslation();
   const [step, setStep] = useState<Step>("upload");
@@ -228,23 +226,16 @@ export default function FormFillPage() {
 
   // ─── Render ───────────────────────────────────────────
 
-  if (!isLoaded) {
-    return (
-      <main className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
-      </main>
-    );
-  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 px-6 pb-24 pt-28">
       <div className="flex items-center gap-3">
-        <Link href="/assistant" className="text-saathi-forest">
+        <Link href="/assistant" className="text-bharatlink-tealDark">
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </Link>
-        <h1 className="font-display text-2xl font-semibold text-saathi-ink">
+        <h1 className="font-display text-2xl font-semibold text-bharatlink-navy">
           Fill Offline Form
         </h1>
       </div>
@@ -258,14 +249,14 @@ export default function FormFillPage() {
       {/* Step 1: Upload */}
       {step === "upload" && (
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-saathi-ink/70">
+          <p className="text-sm text-bharatlink-navy/70">
             Scan or upload a government form. We&apos;ll detect the language, extract fields, and auto-fill from your profile.
           </p>
 
           <button
             type="button"
             onClick={() => void openCamera()}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-saathi-forest px-6 text-sm font-semibold text-white shadow-md transition hover:bg-saathi-ink"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -274,7 +265,7 @@ export default function FormFillPage() {
             Scan with camera
           </button>
 
-          <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-saathi-forest/30 px-6 text-sm font-medium text-saathi-forest transition hover:bg-saathi-mint/20">
+          <label className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-bharatlink-tealDark/30 px-6 text-sm font-medium text-bharatlink-tealDark transition hover:bg-bharatlink-tealLight/20">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
             </svg>
@@ -283,12 +274,12 @@ export default function FormFillPage() {
           </label>
 
           {/* Demo form + Assistant help */}
-          <div className="mt-2 rounded-2xl border border-saathi-sand bg-saathi-cream/40 p-4">
-            <p className="text-xs font-medium text-saathi-ink/60 mb-3">Try it out:</p>
+          <div className="mt-2 rounded-2xl border border-bharatlink-sand bg-bharatlink-cream/40 p-4">
+            <p className="text-xs font-medium text-bharatlink-navy/60 mb-3">Try it out:</p>
             <a
               href="/demo-form.pdf"
               download="PM-KISAN-Application-Form.pdf"
-              className="inline-flex items-center gap-2 text-sm font-medium text-saathi-forest hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-medium text-bharatlink-tealDark hover:underline"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -299,18 +290,18 @@ export default function FormFillPage() {
 
           <Link
             href="/assistant"
-            className="flex items-center gap-3 rounded-2xl border border-saathi-forest/20 bg-gradient-to-r from-saathi-mint/20 to-saathi-forest/5 p-4 transition hover:shadow-md hover:border-saathi-forest/40"
+            className="flex items-center gap-3 rounded-2xl border border-bharatlink-tealDark/20 bg-gradient-to-r from-bharatlink-tealLight/20 to-bharatlink-tealDark/5 p-4 transition hover:shadow-md hover:border-bharatlink-tealDark/40"
           >
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-saathi-forest text-white">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-bharatlink-tealDark text-white">
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
               </svg>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-saathi-ink">Need help filling a form?</p>
-              <p className="text-xs text-saathi-ink/60">Ask the assistant — it&apos;ll guide you step by step, by voice</p>
+              <p className="text-sm font-semibold text-bharatlink-navy">Need help filling a form?</p>
+              <p className="text-xs text-bharatlink-navy/60">Ask the assistant — it&apos;ll guide you step by step, by voice</p>
             </div>
-            <svg className="h-4 w-4 text-saathi-forest" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <svg className="h-4 w-4 text-bharatlink-tealDark" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </Link>
@@ -319,7 +310,7 @@ export default function FormFillPage() {
 
       {/* Camera */}
       {cameraOpen && (
-        <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-saathi-forest/30 bg-black">
+        <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-bharatlink-tealDark/30 bg-black">
           <video ref={videoRef} className="w-full" autoPlay playsInline muted />
           <canvas ref={canvasRef} className="hidden" />
           <div className="absolute inset-x-0 bottom-0 flex justify-center gap-4 bg-gradient-to-t from-black/80 to-transparent p-4">
@@ -328,7 +319,7 @@ export default function FormFillPage() {
               onClick={captureAndScan}
               className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg"
             >
-              <div className="h-12 w-12 rounded-full border-4 border-saathi-forest" />
+              <div className="h-12 w-12 rounded-full border-4 border-bharatlink-tealDark" />
             </button>
             <button
               type="button"
@@ -347,19 +338,19 @@ export default function FormFillPage() {
       {/* Scanning */}
       {step === "scanning" && (
         <div className="flex flex-col items-center gap-4 py-12">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
-          <p className="text-sm text-saathi-ink/60">Scanning form and extracting fields...</p>
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+          <p className="text-sm text-bharatlink-navy/60">Scanning form and extracting fields...</p>
         </div>
       )}
 
       {/* Review */}
       {step === "review" && (
         <div className="flex flex-col gap-4">
-          <div className="rounded-xl bg-saathi-mint/20 px-4 py-3">
-            <p className="text-sm font-medium text-saathi-forest">
+          <div className="rounded-xl bg-bharatlink-tealLight/20 px-4 py-3">
+            <p className="text-sm font-medium text-bharatlink-tealDark">
               Detected language: {formLanguage}
             </p>
-            <p className="text-xs text-saathi-ink/60 mt-1">
+            <p className="text-xs text-bharatlink-navy/60 mt-1">
               {Object.keys(filledFields).length} fields auto-filled · {missingFields.length} fields missing
             </p>
           </div>
@@ -370,10 +361,10 @@ export default function FormFillPage() {
               const isMissing = missingFields.includes(field.labelEnglish || field.label);
               return (
                 <div key={i} className="flex flex-col gap-1">
-                  <label className="flex items-center gap-2 text-xs font-medium text-saathi-ink/70">
+                  <label className="flex items-center gap-2 text-xs font-medium text-bharatlink-navy/70">
                     {field.label}
                     {field.labelEnglish && field.labelEnglish !== field.label && (
-                      <span className="text-saathi-ink/40">({field.labelEnglish})</span>
+                      <span className="text-bharatlink-navy/40">({field.labelEnglish})</span>
                     )}
                     {!isMissing && value && (
                       <span className="rounded-full bg-green-100 px-1.5 py-0.5 text-[10px] font-semibold text-green-700">
@@ -392,10 +383,10 @@ export default function FormFillPage() {
                     onChange={(e) =>
                       setFilledFields((prev) => ({ ...prev, [field.label]: e.target.value }))
                     }
-                    className={`w-full rounded-xl border px-4 py-2.5 text-sm text-saathi-ink outline-none transition focus:border-saathi-forest ${
+                    className={`w-full rounded-xl border px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark ${
                       isMissing && !filledFields[field.label]
                         ? "border-amber-300 bg-amber-50"
-                        : "border-saathi-sand bg-white"
+                        : "border-bharatlink-sand bg-white"
                     }`}
                   />
                 </div>
@@ -408,7 +399,7 @@ export default function FormFillPage() {
               <button
                 type="button"
                 onClick={startFillingMissing}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-saathi-forest/30 py-3 text-sm font-medium text-saathi-forest hover:bg-saathi-mint/20"
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-full border border-bharatlink-tealDark/30 py-3 text-sm font-medium text-bharatlink-tealDark hover:bg-bharatlink-tealLight/20"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
@@ -419,7 +410,7 @@ export default function FormFillPage() {
             <button
               type="button"
               onClick={generatePdf}
-              className="flex-1 rounded-full bg-saathi-forest py-3 text-sm font-semibold text-white shadow-md hover:bg-saathi-ink"
+              className="flex-1 rounded-full bg-bharatlink-tealDark py-3 text-sm font-semibold text-white shadow-md hover:bg-bharatlink-navy"
             >
               Generate PDF
             </button>
@@ -430,10 +421,10 @@ export default function FormFillPage() {
       {/* Filling missing fields by voice */}
       {step === "filling" && (
         <div className="flex flex-col items-center gap-6 py-8">
-          <p className="text-sm text-saathi-ink/70 text-center">
+          <p className="text-sm text-bharatlink-navy/70 text-center">
             Field {currentMissing + 1} of {missingFields.length}
           </p>
-          <h2 className="text-lg font-semibold text-saathi-ink text-center">
+          <h2 className="text-lg font-semibold text-bharatlink-navy text-center">
             {missingFields[currentMissing]}
           </h2>
           <button
@@ -442,14 +433,14 @@ export default function FormFillPage() {
             className={`flex h-16 w-16 items-center justify-center rounded-full transition ${
               listening
                 ? "animate-pulse bg-red-500 text-white shadow-lg shadow-red-500/30"
-                : "bg-saathi-forest/10 text-saathi-forest hover:bg-saathi-forest/20"
+                : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark/20"
             }`}
           >
             <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
             </svg>
           </button>
-          <p className="text-xs text-saathi-ink/50">
+          <p className="text-xs text-bharatlink-navy/50">
             {listening ? "Listening..." : "Tap to speak your answer"}
           </p>
           <button
@@ -460,7 +451,7 @@ export default function FormFillPage() {
               setListening(false);
               setStep("review");
             }}
-            className="text-sm text-saathi-ink/50 underline-offset-4 hover:underline"
+            className="text-sm text-bharatlink-navy/50 underline-offset-4 hover:underline"
           >
             Skip — type manually instead
           </button>
@@ -470,8 +461,8 @@ export default function FormFillPage() {
       {/* Generating */}
       {step === "generating" && (
         <div className="flex flex-col items-center gap-4 py-12">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-saathi-forest border-t-transparent" />
-          <p className="text-sm text-saathi-ink/60">Generating your filled form...</p>
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+          <p className="text-sm text-bharatlink-navy/60">Generating your filled form...</p>
         </div>
       )}
 
@@ -483,14 +474,14 @@ export default function FormFillPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-saathi-ink">Form Ready!</h2>
-          <p className="text-sm text-saathi-ink/60 text-center">
+          <h2 className="text-xl font-semibold text-bharatlink-navy">Form Ready!</h2>
+          <p className="text-sm text-bharatlink-navy/60 text-center">
             Your form has been filled. Download the PDF below.
           </p>
           <a
             href={pdfUrl}
-            download={`formsaathi-filled-${Date.now()}.pdf`}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-saathi-forest px-8 text-sm font-semibold text-white shadow-md hover:bg-saathi-ink"
+            download={`BharatLink-filled-${Date.now()}.pdf`}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-bharatlink-tealDark px-8 text-sm font-semibold text-white shadow-md hover:bg-bharatlink-navy"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -508,11 +499,11 @@ export default function FormFillPage() {
                 setFormImage("");
                 setPdfUrl("");
               }}
-              className="text-sm text-saathi-forest underline-offset-4 hover:underline"
+              className="text-sm text-bharatlink-tealDark underline-offset-4 hover:underline"
             >
               Fill another form
             </button>
-            <Link href="/assistant" className="text-sm text-saathi-ink/50 underline-offset-4 hover:underline">
+            <Link href="/assistant" className="text-sm text-bharatlink-navy/50 underline-offset-4 hover:underline">
               Back to assistant
             </Link>
           </div>

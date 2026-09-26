@@ -1,5 +1,5 @@
 /**
- * FormSaathi Agent — tool definitions and server-side executors.
+ * BharatLink Agent — tool definitions and server-side executors.
  *
  * Each tool has an OpenRouter-compatible definition and an executor
  * function that runs server-side within the /api/agent/chat route.

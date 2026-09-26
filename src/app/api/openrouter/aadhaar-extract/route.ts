@@ -1,4 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 import type { ProfileData } from "@/lib/profile-vault";
 import {
@@ -68,9 +67,6 @@ function coerceProfile(parsed: unknown): ProfileData {
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   if (!OPENROUTER_API_KEY) {
     console.error("[openrouter/aadhaar-extract] OPENROUTER_API_KEY missing");

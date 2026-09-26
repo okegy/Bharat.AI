@@ -105,7 +105,7 @@ export function getUiText(_language: IndianLanguageCode, key: string): string {
     "Device may not have a natural voice for this language. Speech can sound incorrect here.": "voice.speechNotSupported",
     "Try text input or another browser/device with this language installed.": "voice.voiceRecognitionFailed",
     "Step 2 of 3": "onboarding.step2of3",
-    "Next in onboarding: WebAuthn fingerprint on this device (optional skip), then your FormSaathi home.": "onboarding.nextOnboarding",
+    "Next in onboarding: WebAuthn fingerprint on this device (optional skip), then your BharatLink home.": "onboarding.nextOnboarding",
     "Point the camera at your Aadhaar card. One photo is sent to a vision API (OpenRouter) to read visible text. You can edit every field before saving; saved data stays only in your encrypted on-device vault.": "aadhaar.cameraDesc",
     "Capture & vault": "aadhaar.captureAndVault",
     "Processing…": "common.processing",
