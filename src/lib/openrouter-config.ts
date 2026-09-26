@@ -103,3 +103,7 @@ export const DEFAULT_OPENROUTER_AGENT_MODEL = "google/gemini-2.5-flash";
 export function getOpenRouterAgentModel(): string {
   return process.env.OPENROUTER_AGENT_MODEL ?? DEFAULT_OPENROUTER_AGENT_MODEL;
 }
+
+export function getOpenRouterApiKey(): string {
+  return (process.env.OPENROUTER_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
+}

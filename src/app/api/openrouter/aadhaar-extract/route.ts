@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ProfileData } from "@/lib/profile-vault";
 import {
   DEFAULT_OPENROUTER_VISION_MODEL,
+  getOpenRouterApiKey,
   getOpenRouterVisionModel,
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
 
 const EXTRACT_KEYS: (keyof ProfileData)[] = [
   "fullName",
@@ -67,7 +66,7 @@ function coerceProfile(parsed: unknown): ProfileData {
 }
 
 export async function POST(request: NextRequest) {
-
+  const OPENROUTER_API_KEY = getOpenRouterApiKey();
   if (!OPENROUTER_API_KEY) {
     console.error("[openrouter/aadhaar-extract] OPENROUTER_API_KEY missing");
     return NextResponse.json(

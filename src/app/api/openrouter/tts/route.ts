@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  getOpenRouterApiKey,
   getOpenRouterAudioOutputFormat,
   getOpenRouterTtsModel,
   getOpenRouterTtsVoice,
@@ -7,8 +8,6 @@ import {
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
 import { collectStreamingAudioBase64 } from "@/lib/openrouter-stream-audio";
-
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
 
 /** Wrap raw PCM16 samples in a WAV header so the browser can play it. */
 function pcm16ToWav(pcmData: Buffer, sampleRate: number): Buffer {
@@ -35,7 +34,7 @@ function pcm16ToWav(pcmData: Buffer, sampleRate: number): Buffer {
 }
 
 export async function POST(request: NextRequest) {
-
+  const OPENROUTER_API_KEY = getOpenRouterApiKey();
   if (!OPENROUTER_API_KEY) {
     return NextResponse.json(
       { error: "Server missing OpenRouter configuration" },

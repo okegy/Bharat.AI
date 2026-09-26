@@ -4,12 +4,13 @@ import type { IndianLanguageCode } from "@/lib/indian-languages";
 import type { AgentPhase } from "@/lib/agent-state";
 import {
   getOpenRouterAgentModel,
+  getOpenRouterApiKey,
   getVoiceLangLabel,
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
 import { getToolDefinitions, executeTool, type ToolContext } from "@/lib/agent-tools";
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
+const OPENROUTER_API_KEY = getOpenRouterApiKey();
 const MAX_TOOL_ITERATIONS = 10;
 
 interface ChatMessage {
@@ -106,7 +107,7 @@ ${phaseInstructions[phase]}${screenNote}`;
 }
 
 export async function POST(request: NextRequest) {
-
+  const OPENROUTER_API_KEY = getOpenRouterApiKey();
   if (!OPENROUTER_API_KEY)
     return NextResponse.json(
       { error: "Server missing OpenRouter configuration" },

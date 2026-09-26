@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   getOpenRouterAgentModel,
+  getOpenRouterApiKey,
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY ?? "";
-
 export async function POST(request: NextRequest) {
+  const OPENROUTER_API_KEY = getOpenRouterApiKey();
 
   if (!OPENROUTER_API_KEY)
     return NextResponse.json(
