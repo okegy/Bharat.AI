@@ -290,13 +290,22 @@ export function listen(options: ListenOptions = {}): ListenHandle | null {
   if (typeof window === "undefined") return null;
 
   const lang = options.lang ?? "en";
+  const bcp = resolveBcp47(lang);
   const voiceCode = resolveVoiceLangCode(lang);
 
+  // 1. Prioritize native Web Speech API (zero-latency, live streaming, regional language support)
+  if (getRecognitionClass()) {
+    const handle = listenViaBrowser(options, bcp);
+    if (handle) return handle;
+  }
+
+  // 2. Fallback to OpenRouter audio transcription
   if (typeof navigator.mediaDevices?.getUserMedia === "function") {
     return listenViaOpenRouter(options, voiceCode);
   }
 
-  return listenViaBrowser(options, resolveBcp47(lang));
+  options.onError?.(i18n.t("voice.speechNotSupported") as string);
+  return null;
 }
 
 function listenViaOpenRouter(
@@ -518,7 +527,11 @@ function listenViaBrowser(
 
   recognition.onerror = (event: RecognizerErrorEvent) => {
     if (event.error === "no-speech" || event.error === "aborted") return;
-    options.onError?.(event.error);
+    if (event.error === "not-allowed" || event.error === "permission-denied") {
+      options.onError?.(i18n.t("voice.microphoneDenied") as string || "Microphone access is blocked. Please allow mic permissions in your browser.");
+      return;
+    }
+    options.onError?.(i18n.t("voice.voiceRecognitionFailed") as string);
   };
 
   recognition.onend = () => {
