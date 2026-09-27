@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 856 540" width="856" height="540">
+  <defs>
+    <linearGradient id="flag" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF9933" />
+      <stop offset="50%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#138808" />
+    </linearGradient>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF8" />
+      <stop offset="100%" stop-color="#F4EFE6" />
+    </linearGradient>
+  </defs>
+
+  <rect width="856" height="540" rx="24" fill="url(#bg)" stroke="#D4AF37" stroke-width="3" />
+  
+  <!-- Header Bar -->
+  <rect x="0" y="0" width="856" height="75" rx="24" fill="#FFFFFF" />
+  <rect x="0" y="55" width="856" height="20" fill="url(#flag)" opacity="0.85" />
+  
+  <text x="50" y="38" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="bold" fill="#0A3A60">भारतीय विशिष्ट पहचान प्राधिकरण</text>
+  <text x="50" y="52" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="bold" fill="#0A3A60">Unique Identification Authority of India</text>
+  
+  <text x="806" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="bold" fill="#E11D48" text-anchor="end">पता / Address</text>
+
+  <!-- Left Column: Hindi Address -->
+  <g transform="translate(50, 110)">
+    <text x="0" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="bold" fill="#0A3A60">पता:</text>
+    <text x="0" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#1E293B">आत्मज: हरि ओम शर्मा,</text>
+    <text x="0" y="85" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#1E293B">मकान नंबर ४२, ग्राम रामपुर,</text>
+    <text x="0" y="115" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#1E293B">डाकघर: शिवपुर, तहसील: सदर,</text>
+    <text x="0" y="145" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#1E293B">जिला: वाराणसी, उत्तर प्रदेश - २२१००१</text>
+  </g>
+
+  <!-- Right Column: English Address -->
+  <g transform="translate(440, 110)">
+    <text x="0" y="25" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="bold" fill="#0A3A60">Address:</text>
+    <text x="0" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">S/O: Hari Om Sharma,</text>
+    <text x="0" y="85" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">House No 42, Village Rampur,</text>
+    <text x="0" y="115" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="600" fill="#0F172A">Post: Shivpur, Tehsil: Sadar,</text>
+    <text x="0" y="145" font-family="'Segoe UI', Arial, sans-serif" font-size="16" font-weight="bold" fill="#0F172A">District: Varanasi, Uttar Pradesh - 221001</text>
+  </g>
+
+  <!-- Barcode Representation -->
+  <g transform="translate(180, 290)">
+    <rect x="0" y="0" width="500" height="60" fill="#FFFFFF" stroke="#E2E8F0" rx="6" />
+    <!-- Barcode stripes -->
+    <path d="M 20 10 v 40 M 26 10 v 40 M 34 10 v 40 M 38 10 v 40 M 46 10 v 40 M 56 10 v 40 M 62 10 v 40 M 74 10 v 40 M 80 10 v 40 M 92 10 v 40 M 100 10 v 40 M 108 10 v 40 M 120 10 v 40 M 130 10 v 40 M 142 10 v 40 M 150 10 v 40 M 160 10 v 40 M 172 10 v 40 M 184 10 v 40 M 190 10 v 40 M 205 10 v 40 M 215 10 v 40 M 225 10 v 40 M 238 10 v 40 M 250 10 v 40 M 264 10 v 40 M 274 10 v 40 M 288 10 v 40 M 300 10 v 40 M 312 10 v 40 M 325 10 v 40 M 340 10 v 40 M 355 10 v 40 M 370 10 v 40 M 382 10 v 40 M 395 10 v 40 M 410 10 v 40 M 425 10 v 40 M 440 10 v 40 M 455 10 v 40 M 470 10 v 40 M 480 10 v 40" stroke="#0F172A" stroke-width="4" stroke-linecap="butt" />
+  </g>
+
+  <!-- Separator Line -->
+  <line x1="45" y1="390" x2="810" y2="390" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="6,4" />
+
+  <!-- Aadhaar Number (Large bold digits) -->
+  <text x="428" y="445" font-family="'Consolas', 'Courier New', monospace" font-size="36" font-weight="900" fill="#0F172A" text-anchor="middle" letter-spacing="4">
+    4767  1659  1624
+  </text>
+  
+  <text x="428" y="475" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="600" fill="#475569" text-anchor="middle">
+    www.uidai.gov.in • Toll Free: 1947 • help@uidai.gov.in
+  </text>
+
+  <!-- Footer Red Wave Accent -->
+  <rect x="0" y="515" width="856" height="25" rx="12" fill="#0A3A60" />
+  <text x="428" y="532" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    SAMPLE AADHAAR BACK • TEST SUITE FOR BHARAT-AI HACKATHON
+  </text>
+</svg>

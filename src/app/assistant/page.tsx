@@ -788,6 +788,15 @@ export default function AssistantPage() {
         {(uiState === "listening" || uiState === "speaking") && (
           <WaveformBars active color={uiState === "listening" ? "#ef4444" : "#4ade80"} />
         )}
+        <Link
+          href="/samples"
+          target="_blank"
+          className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-teal-200 transition hover:bg-white/20"
+          style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
+          title="Open Sample Documents for testing OCR & Scanning"
+        >
+          🧪 <span className="hidden sm:inline">Test</span> Samples
+        </Link>
         {screenShareActive && (
           <span
             className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold text-white"
