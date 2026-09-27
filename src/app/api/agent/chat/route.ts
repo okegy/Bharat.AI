@@ -10,7 +10,6 @@ import {
 } from "@/lib/openrouter-config";
 import { getToolDefinitions, executeTool, type ToolContext } from "@/lib/agent-tools";
 
-const OPENROUTER_API_KEY = getOpenRouterApiKey();
 const MAX_TOOL_ITERATIONS = 10;
 
 interface ChatMessage {
@@ -175,10 +174,17 @@ export async function POST(request: NextRequest) {
       });
 
       if (!res.ok) {
-        const err = await res.text();
-        console.error("[agent/chat] OpenRouter error", res.status, err);
+        const errText = await res.text();
+        console.error("[agent/chat] OpenRouter error", res.status, model, errText);
+        let errDetail: string;
+        try {
+          const errJson = JSON.parse(errText);
+          errDetail = errJson?.error?.message ?? errJson?.message ?? errText.slice(0, 500);
+        } catch {
+          errDetail = errText.slice(0, 500);
+        }
         return NextResponse.json(
-          { error: "Agent request failed", detail: err.slice(0, 500) },
+          { error: `Agent failed (${res.status}): ${errDetail}`, model },
           { status: 502 },
         );
       }

@@ -98,7 +98,7 @@ export function getOpenRouterAudioOutputFormat(): string {
 }
 
 /** Agent brain model — handles tool calling, vision, multilingual reasoning. */
-export const DEFAULT_OPENROUTER_AGENT_MODEL = "google/gemini-2.5-flash";
+export const DEFAULT_OPENROUTER_AGENT_MODEL = "openai/gpt-4o-mini";
 
 export function getOpenRouterAgentModel(): string {
   return process.env.OPENROUTER_AGENT_MODEL ?? DEFAULT_OPENROUTER_AGENT_MODEL;
