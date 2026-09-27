@@ -110,6 +110,7 @@ export default function AssistantPage() {
   // Camera
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraPurpose, setCameraPurpose] = useState("");
+  const [cameraFacingMode, setCameraFacingMode] = useState<"environment" | "user">("environment");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraStreamRef = useRef<MediaStream | null>(null);
@@ -527,35 +528,50 @@ export default function AssistantPage() {
 
   // ─── Camera ───────────────────────────────────────────
 
-  async function openCamera() {
+  const openCamera = useCallback(async (facing: "environment" | "user" = "environment") => {
     setCameraOpen(true);
+    setCameraFacingMode(facing);
     try {
+      if (cameraStreamRef.current) {
+        cameraStreamRef.current.getTracks().forEach((t) => t.stop());
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1080 } },
       });
       cameraStreamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+        await videoRef.current.play().catch(() => {});
       }
     } catch {
-      setCameraOpen(false);
-      setError("Camera access denied");
+      setError("Camera permission denied or camera unavailable");
     }
-  }
+  }, []);
 
-  function stopCamera() {
+  const switchCamera = useCallback(() => {
+    const next = cameraFacingMode === "environment" ? "user" : "environment";
+    openCamera(next);
+  }, [cameraFacingMode, openCamera]);
+
+  const stopCamera = useCallback(() => {
     cameraStreamRef.current?.getTracks().forEach((t) => t.stop());
     cameraStreamRef.current = null;
     setCameraOpen(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    if (cameraOpen && videoRef.current && cameraStreamRef.current) {
+      videoRef.current.srcObject = cameraStreamRef.current;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [cameraOpen]);
 
   function capturePhoto() {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    canvas.width = Math.min(video.videoWidth, 1600);
-    canvas.height = Math.round((canvas.width / video.videoWidth) * video.videoHeight);
+    canvas.width = Math.min(video.videoWidth || 1280, 1600);
+    canvas.height = Math.round((canvas.width / (video.videoWidth || 1280)) * (video.videoHeight || 720));
     canvas.getContext("2d")!.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
     stopCamera();
@@ -567,7 +583,7 @@ export default function AssistantPage() {
         phaseRef.current = "offline-scan";
         sendToAgentRef.current(`I scanned a form. Please detect the language, extract all fields, and fill them from my profile.`, [dataUrl]);
       } else {
-        sendToAgentRef.current(`Scanned ${cameraPurpose || "document"}`, [dataUrl]);
+        sendToAgentRef.current(`I scanned a document or Aadhaar card. Please extract all the information, verify it, and guide me on what to do next.`, [dataUrl]);
       }
     };
     trySend();
@@ -1094,6 +1110,94 @@ export default function AssistantPage() {
           )}
         </div>
       </div>
+
+      {/* ── Camera Scanner Modal ── */}
+      {cameraOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-black/95 p-4 backdrop-blur-md">
+          {/* Top Bar */}
+          <div className="flex w-full max-w-md items-center justify-between pt-2">
+            <div className="flex items-center gap-2 text-white">
+              <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-sm font-semibold tracking-wide">
+                {cameraPurpose === "form_scan" ? "Scan Form Document" : "Scan Aadhaar / Document"}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={stopCamera}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25 active:scale-95"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Viewfinder Frame */}
+          <div className="relative flex w-full max-w-md flex-1 items-center justify-center overflow-hidden rounded-3xl my-4 bg-slate-900 border border-white/15 shadow-2xl">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="h-full w-full object-cover"
+            />
+            <canvas ref={canvasRef} className="hidden" />
+
+            {/* Document Guide Box */}
+            <div className="pointer-events-none absolute inset-5 rounded-2xl border-2 border-dashed border-emerald-400/80 shadow-[0_0_25px_rgba(52,211,153,0.35)] flex flex-col items-center justify-between p-4">
+              <span className="rounded-full bg-black/70 px-3 py-1 text-[11px] font-medium text-emerald-300 backdrop-blur-sm">
+                Align document or Aadhaar card inside frame
+              </span>
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-pulse" />
+            </div>
+          </div>
+
+          {/* Controls Bar */}
+          <div className="flex w-full max-w-md items-center justify-around pb-4">
+            {/* Flip Camera */}
+            <button
+              type="button"
+              onClick={switchCamera}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25 active:scale-95"
+              title="Flip Camera"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+            </button>
+
+            {/* Snap / Shutter Button */}
+            <button
+              type="button"
+              onClick={capturePhoto}
+              className="group relative flex h-20 w-20 items-center justify-center rounded-full border-4 border-white bg-white/20 p-1 shadow-2xl transition hover:scale-105 active:scale-95"
+              title="Take Photo"
+            >
+              <span className="h-full w-full rounded-full bg-white transition group-hover:bg-emerald-400 group-active:scale-90" />
+            </button>
+
+            {/* File Upload Fallback */}
+            <label
+              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25 active:scale-95"
+              title="Upload photo from files"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  stopCamera();
+                  handleFileUpload(e);
+                }}
+              />
+            </label>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
