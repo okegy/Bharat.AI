@@ -54,24 +54,86 @@ body {
 /* ─── Typography helpers ─────────── */
 .font-display { font-family: var(--font-display); }
 
-/* ─── Gradient mesh hero ─────────── */
-.bg-hero-mesh {
+/* ─── Ambient Mesh Background ────── */
+.bg-hero-mesh,
+.bg-ambient-mesh {
   background:
-    radial-gradient(ellipse 110% 70% at 55% -10%, rgba(20,184,166,0.18), transparent 55%),
-    radial-gradient(ellipse 70% 55% at 100% 0%,   rgba(234,88,12,0.10),  transparent 55%),
-    radial-gradient(ellipse 50% 50% at 0% 100%,   rgba(15,118,110,0.08), transparent 55%),
+    radial-gradient(circle 600px at 15% 15%, rgba(234, 88, 12, 0.09), transparent 75%),
+    radial-gradient(circle 750px at 85% 85%, rgba(20, 184, 166, 0.14), transparent 75%),
+    radial-gradient(circle 500px at 50% 30%, rgba(15, 118, 110, 0.06), transparent 70%),
     var(--bl-cream);
 }
 
-/* ─── Glass card ─────────────────── */
+/* ─── Glassmorphism Surfaces ─────── */
 .glass {
-  background: rgba(255,255,255,0.75);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.6);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
 }
 
-/* ─── Waveform animation ─────────── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 4px 24px -2px rgba(15, 23, 42, 0.05);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(234, 88, 12, 0.35);
+  box-shadow: 0 12px 36px -4px rgba(234, 88, 12, 0.12), 0 0 20px 0 rgba(234, 88, 12, 0.08);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
+}
+
+.glass-nav {
+  background: rgba(253, 251, 247, 0.84);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(243, 237, 228, 0.85);
+  box-shadow: 0 4px 20px 0 rgba(15, 23, 42, 0.04);
+}
+
+/* ─── Coral Glow Accents ─────────── */
+.glow-coral {
+  position: relative;
+}
+
+.glow-coral::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(circle, rgba(234, 88, 12, 0.45) 0%, rgba(234, 88, 12, 0) 70%);
+  border-radius: inherit;
+  filter: blur(12px);
+  z-index: -1;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+}
+
+.glow-coral:hover::before {
+  opacity: 1;
+}
+
+/* ─── Waveform & Motion Animations ── */
 @keyframes waveBar {
   0%, 100% { transform: scaleY(0.4); opacity: 0.45; }
   50%       { transform: scaleY(1.0); opacity: 1;    }
@@ -80,21 +142,18 @@ body {
   animation: waveBar 1.0s ease-in-out infinite;
 }
 
-/* ─── Float animation ────────────── */
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
   50%       { transform: translateY(-8px); }
 }
 .animate-float { animation: float 5s ease-in-out infinite; }
 
-/* ─── Pulse bar ──────────────────── */
 @keyframes pulsebar {
   0%, 100% { opacity: 0.35; transform: scaleY(0.5); }
   50%       { opacity: 1;    transform: scaleY(1);   }
 }
 .animate-pulsebar { animation: pulsebar 1.2s ease-in-out infinite; }
 
-/* ─── Shimmer loading ────────────── */
 @keyframes shimmer {
   0%   { background-position: -400px 0; }
   100% { background-position: 400px 0;  }
@@ -105,12 +164,35 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* ─── Touch target helpers ───────── */
+/* ─── Custom Cursor System (Desktop Only) ─── */
+@media (hover: hover) and (pointer: fine) {
+  html.custom-cursor-active,
+  html.custom-cursor-active * {
+    cursor: none !important;
+  }
+}
+
+@keyframes cursorRipple {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+.animate-cursor-ripple {
+  animation: cursorRipple 0.35s ease-out forwards;
+}
+
+/* ─── Touch Target Helpers ───────── */
 .touch-target {
   min-height: 48px;
   min-width: 48px;
 }
 
-/* ─── Safe area padding ──────────── */
+/* ─── Safe Area Padding ──────────── */
 .pb-safe  { padding-bottom: env(safe-area-inset-bottom, 16px); }
 .pt-safe  { padding-top:    env(safe-area-inset-top, 0px);    }

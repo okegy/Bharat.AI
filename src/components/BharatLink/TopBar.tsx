@@ -1,6 +1,7 @@
 "use client";
 
 import { BiometricSetupNavLink } from "@/components/BharatLink/BiometricSetupNavLink";
+import { CursorToggle } from "@/components/BharatLink/CursorToggle";
 import { LanguagePickerNavLink } from "@/components/BharatLink/LanguagePickerNavLink";
 import { useAppLanguage } from "@/lib/app-language";
 import { isWebAuthnAvailable } from "@/lib/biometric-storage";
@@ -19,20 +20,22 @@ export function TopBar() {
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-bharatlink-sand/80 bg-bharatlink-cream/90 backdrop-blur-md">
+    <header className="fixed inset-x-0 top-0 z-50 glass-nav">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="font-display text-lg font-semibold tracking-tight text-bharatlink-navy"
+          className="font-display text-lg font-bold tracking-tight text-bharatlink-navy flex items-center gap-2"
         >
-          BharatLink
+          <span className="h-3 w-3 rounded-full bg-orange-500 shadow-[0_0_10px_#ea580c] animate-pulse" />
+          <span>BharatLink</span>
         </Link>
-        <div className="flex items-center gap-4">
-          <LanguagePickerNavLink className="text-sm font-medium text-bharatlink-navy/80 underline-offset-4 transition hover:text-bharatlink-tealDark hover:underline">
+        <div className="flex items-center gap-3">
+          <CursorToggle />
+          <LanguagePickerNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-bharatlink-tealDark hover:underline">
             {getUiText(language, "Language")}
           </LanguagePickerNavLink>
           {showBiometric ? (
-            <BiometricSetupNavLink className="text-sm font-medium text-bharatlink-navy/80 underline-offset-4 transition hover:text-bharatlink-tealDark hover:underline">
+            <BiometricSetupNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-bharatlink-tealDark hover:underline">
               {getUiText(language, "Fingerprint")}
             </BiometricSetupNavLink>
           ) : null}

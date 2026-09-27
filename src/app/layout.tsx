@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ClearVaultUnlockOnSignOut } from "@/components/BharatLink/ClearVaultUnlockOnSignOut";
+import { CustomCursor } from "@/components/BharatLink/CustomCursor";
 import { LanguageProvider } from "@/lib/app-language";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Outfit, Inter } from "next/font/google";
@@ -46,8 +47,9 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/dashboard"
     >
       <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
-        <body className="min-h-screen font-sans">
+        <body className="min-h-screen font-sans bg-ambient-mesh">
           <LanguageProvider>
+            <CustomCursor />
             <ClearVaultUnlockOnSignOut />
             {children}
           </LanguageProvider>
@@ -56,4 +58,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-

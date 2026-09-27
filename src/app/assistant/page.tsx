@@ -1053,9 +1053,10 @@ export default function AssistantPage() {
               <button
                 type="button"
                 id="mic-button"
+                data-cursor="mic"
                 onClick={toggleMic}
                 disabled={uiState === "thinking" || !isSTTAvailable()}
-                className="relative flex h-[68px] w-[68px] items-center justify-center rounded-full shadow-xl transition-all hover:scale-105 disabled:opacity-40"
+                className={`relative flex h-[68px] w-[68px] items-center justify-center rounded-full shadow-xl transition-all hover:scale-105 disabled:opacity-40 ${uiState === "listening" ? "glow-coral" : ""}`}
                 style={{ background: micBg }}
               >
                 {uiState === "listening" ? (

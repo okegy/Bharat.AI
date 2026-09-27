@@ -184,7 +184,7 @@ export default function Home() {
             <div className="relative z-10 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-md animate-float">
                 <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-bharatlink-tealLight/50 to-bharatlink-terracotta/20 blur-xl" />
-                <div className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-white/90 p-8 shadow-xl shadow-bharatlink-navy/10 backdrop-blur">
+                <div className="relative overflow-hidden rounded-[2rem] glass-panel p-8 shadow-2xl shadow-bharatlink-navy/10">
                   <div className="mb-6 flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-red-400" />
                     <span className="h-2 w-2 rounded-full bg-amber-400" />
@@ -193,7 +193,7 @@ export default function Home() {
                       {t("home.govtPortalPreview")}
                     </span>
                   </div>
-                  <div className="space-y-3 rounded-2xl bg-bharatlink-cream p-4">
+                  <div className="space-y-3 rounded-2xl glass-card p-4">
                     <div className="h-2 w-3/4 rounded bg-bharatlink-sand" />
                     <div className="h-2 w-full rounded bg-bharatlink-tealLight/60" />
                     <div className="h-2 w-5/6 rounded bg-bharatlink-sand" />
@@ -220,7 +220,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="border-y border-bharatlink-sand bg-white px-4 py-16 sm:px-6">
+        <section className="border-y border-bharatlink-sand/60 bg-transparent px-4 py-16 sm:px-6">
           <div className="mx-auto max-w-6xl">
             <h2 className="font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
               {t("home.langSectionTitle")}
@@ -232,12 +232,12 @@ export default function Home() {
               {INDIAN_LANGUAGES.map((lang) => (
                 <li
                   key={lang.code}
-                  className="rounded-2xl border border-bharatlink-sand bg-bharatlink-cream/50 px-4 py-4 text-center transition hover:border-bharatlink-tealLight/80 hover:bg-white"
+                  className="rounded-2xl glass-card px-4 py-4 text-center cursor-pointer"
                 >
-                  <span className="block text-lg font-medium text-bharatlink-navy">
+                  <span className="block text-lg font-semibold text-bharatlink-navy">
                     {lang.script}
                   </span>
-                  <span className="mt-1 block text-xs text-bharatlink-navy/50">
+                  <span className="mt-1 block text-xs font-medium text-bharatlink-navy/60">
                     {lang.label}
                   </span>
                 </li>
@@ -263,7 +263,7 @@ export default function Home() {
                     key={icon}
                     className="relative grid gap-4 pl-14 sm:grid-cols-[auto_1fr] sm:gap-8 sm:pl-20"
                   >
-                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-2xl border border-bharatlink-sand bg-white shadow-sm sm:left-1 sm:h-12 sm:w-12">
+                    <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-2xl glass-card sm:left-1 sm:h-12 sm:w-12">
                       <StepIcon name={icon} />
                     </div>
                     <div className="pt-0.5 sm:pt-1">
@@ -298,7 +298,7 @@ export default function Home() {
               ).map((key) => (
                 <li
                   key={key}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-lg leading-snug text-bharatlink-tealLight/95 backdrop-blur"
+                  className="rounded-2xl glass-dark px-5 py-4 text-lg leading-snug text-bharatlink-tealLight/95"
                 >
                   {t(`home.${key}`)}
                 </li>
@@ -308,7 +308,7 @@ export default function Home() {
         </section>
 
         <section className="px-4 py-16 sm:px-6">
-          <div className="mx-auto max-w-6xl rounded-[2rem] border border-bharatlink-sand bg-gradient-to-br from-white to-bharatlink-cream p-8 shadow-sm sm:p-10">
+          <div className="mx-auto max-w-6xl rounded-[2rem] glass-panel p-8 shadow-md sm:p-10">
             <h2 className="font-display text-2xl font-semibold text-bharatlink-navy">
               {t("home.vaultTitle")}
             </h2>
