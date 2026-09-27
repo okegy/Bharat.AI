@@ -1,7 +1,7 @@
 "use client";
 
 /* ─── Waveform bars component ─── */
-function WaveformBars({ active, color = "#14b8a6" }: { active: boolean; color?: string }) {
+function WaveformBars({ active, color = "#ea580c" }: { active: boolean; color?: string }) {
   const heights = [0.4, 0.7, 1.0, 0.85, 0.6, 0.9, 0.5, 0.75, 0.45, 0.65];
   return (
     <div className="flex items-center gap-[3px] h-8">
@@ -30,10 +30,10 @@ type UIState = "idle" | "listening" | "thinking" | "speaking";
 /* ─── Status ring around mic button ─── */
 function MicRing({ state }: { state: UIState }) {
   const colors: Record<UIState, string> = {
-    idle: "rgba(15,118,110,0.15)",
-    listening: "rgba(239,68,68,0.25)",
-    thinking: "rgba(234,88,12,0.2)",
-    speaking: "rgba(20,184,166,0.25)",
+    idle: "rgba(234,88,12,0.15)",
+    listening: "rgba(239,68,68,0.3)",
+    thinking: "rgba(245,158,11,0.25)",
+    speaking: "rgba(234,88,12,0.35)",
   };
   return (
     <span
@@ -748,24 +748,24 @@ export default function AssistantPage() {
   }[uiState];
 
   const micBg = {
-    idle: "linear-gradient(135deg, #0f766e, #14b8a6)",
+    idle: "linear-gradient(135deg, #ea580c, #f97316)",
     listening: "linear-gradient(135deg, #dc2626, #ef4444)",
-    thinking: "linear-gradient(135deg, #ea580c, #f97316)",
-    speaking: "linear-gradient(135deg, #0d9488, #14b8a6)",
+    thinking: "linear-gradient(135deg, #f59e0b, #d97706)",
+    speaking: "linear-gradient(135deg, #ea580c, #c2410c)",
   }[uiState];
 
   // ─── Render ───────────────────────────────────────────
 
   return (
-    <main className="mx-auto flex h-screen max-w-2xl flex-col" style={{ background: "var(--bl-cream)" }}>
+    <main className="mx-auto flex h-screen max-w-2xl flex-col bg-ambient-mesh">
       {/* ── Gradient Header ── */}
       <header
-        className="relative flex items-center gap-3 px-4 py-3 shadow-sm"
-        style={{ background: "linear-gradient(135deg, #0f766e 0%, #0f172a 100%)" }}
+        className="relative flex items-center gap-3 px-4 py-3 shadow-md glass-dark"
+        style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)" }}
       >
         <Link
           href="/dashboard"
-          className="flex h-9 w-9 items-center justify-center rounded-full transition"
+          className="flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-white/20"
           style={{ background: "rgba(255,255,255,0.12)" }}
         >
           <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -773,12 +773,15 @@ export default function AssistantPage() {
           </svg>
         </Link>
         <div className="flex-1">
-          <h1 className="font-display text-lg font-bold text-white tracking-tight">BharatLink</h1>
+          <h1 className="font-display text-lg font-bold text-white tracking-tight flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_#ea580c] animate-pulse" />
+            <span>BharatLink</span>
+          </h1>
           <div className="flex items-center gap-2">
             <span
               className="h-1.5 w-1.5 rounded-full"
               style={{
-                background: uiState === "idle" ? "#4ade80" : uiState === "listening" ? "#ef4444" : "#f97316",
+                background: uiState === "idle" ? "#ea580c" : uiState === "listening" ? "#ef4444" : "#f59e0b",
                 animation: uiState !== "idle" ? "pulsebar 1s ease-in-out infinite" : "none",
               }}
             />
@@ -786,13 +789,13 @@ export default function AssistantPage() {
           </div>
         </div>
         {(uiState === "listening" || uiState === "speaking") && (
-          <WaveformBars active color={uiState === "listening" ? "#ef4444" : "#4ade80"} />
+          <WaveformBars active color={uiState === "listening" ? "#ef4444" : "#f97316"} />
         )}
         <Link
           href="/samples"
           target="_blank"
-          className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-teal-200 transition hover:bg-white/20"
-          style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
+          className="flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold text-orange-300 transition hover:bg-orange-500/20"
+          style={{ background: "rgba(234,88,12,0.15)", border: "1px solid rgba(234,88,12,0.3)" }}
           title="Open Sample Documents for testing OCR & Scanning"
         >
           🧪 <span className="hidden sm:inline">Test</span> Samples
@@ -814,8 +817,8 @@ export default function AssistantPage() {
           <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             {msg.role === "assistant" && (
               <div
-                className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-sm"
-                style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+                className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-extrabold text-white shadow-md shadow-orange-500/30"
+                style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
               >
                 BL
               </div>
@@ -824,8 +827,8 @@ export default function AssistantPage() {
               className="max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm"
               style={
                 msg.role === "user"
-                  ? { background: "linear-gradient(135deg, #0f766e, #0f172a)", color: "#fff", borderBottomRightRadius: 4 }
-                  : { background: "rgba(255,255,255,0.92)", border: "1px solid rgba(20,184,166,0.2)", color: "#0f172a", borderBottomLeftRadius: 4 }
+                  ? { background: "linear-gradient(135deg, #ea580c, #c2410c)", color: "#fff", borderBottomRightRadius: 4 }
+                  : { background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", border: "1px solid rgba(234,88,12,0.18)", color: "#0f172a", borderBottomLeftRadius: 4 }
               }
             >
               {msg.imageUrl && (
@@ -841,8 +844,8 @@ export default function AssistantPage() {
                       setTimeout(() => { setPhase("online-guide"); phaseRef.current = "online-guide"; startScreenShare(); }, 2000);
                     }
                   }}
-                  className="mb-2 flex items-center gap-2 rounded-xl px-4 py-3 text-white text-sm font-semibold shadow-md transition hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+                  className="mb-2 flex items-center gap-2 rounded-xl px-4 py-3 text-white text-sm font-semibold shadow-md transition hover:opacity-90 glow-coral"
+                  style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
                 >
                   <svg className="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -856,9 +859,9 @@ export default function AssistantPage() {
                   href={msg.formDownload.path}
                   download
                   className="mt-2 flex items-center gap-3 rounded-xl p-3 transition hover:shadow-md"
-                  style={{ border: "1px solid rgba(15,118,110,0.2)", background: "#f0fdfc" }}
+                  style={{ border: "1px solid rgba(234,88,12,0.25)", background: "#fff7ed" }}
                 >
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
@@ -866,7 +869,7 @@ export default function AssistantPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate" style={{ color: "#0f172a" }}>{msg.formDownload.nameHi}</p>
                     <p className="text-xs truncate" style={{ color: "rgba(15,23,42,0.5)" }}>{msg.formDownload.name}</p>
-                    <p className="text-[10px] font-medium mt-0.5" style={{ color: "#0f766e" }}>Download PDF ↓</p>
+                    <p className="text-[10px] font-bold mt-0.5" style={{ color: "#ea580c" }}>Download PDF ↓</p>
                   </div>
                 </a>
               )}
@@ -874,8 +877,8 @@ export default function AssistantPage() {
                 <a
                   href={`data:application/pdf;base64,${msg.pdfDownload.base64}`}
                   download={msg.pdfDownload.filename}
-                  className="mt-2 flex items-center gap-3 rounded-xl p-3 text-white transition hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg, #0f766e, #0d9488)" }}
+                  className="mt-2 flex items-center gap-3 rounded-xl p-3 text-white transition hover:opacity-90 glow-coral"
+                  style={{ background: "linear-gradient(135deg, #ea580c, #c2410c)" }}
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -883,23 +886,23 @@ export default function AssistantPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold">Download PDF</p>
+                    <p className="text-sm font-bold">Download PDF</p>
                     <p className="text-xs text-white/70">{msg.pdfDownload.filename}</p>
                   </div>
                 </a>
               )}
               {msg.showUploadCard && (
                 <label
-                  className="mt-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition"
-                  style={{ border: "2px dashed rgba(15,118,110,0.3)", background: "rgba(255,255,255,0.6)" }}
+                  className="mt-3 flex cursor-pointer items-center gap-3 rounded-xl p-3 transition hover:border-orange-500/60"
+                  style={{ border: "2px dashed rgba(234,88,12,0.35)", background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)" }}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "rgba(15,118,110,0.1)", color: "#0f766e" }}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ background: "rgba(234,88,12,0.12)", color: "#ea580c" }}>
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: "#0f766e" }}>Upload Form</p>
+                    <p className="text-sm font-bold" style={{ color: "#ea580c" }}>Upload Form</p>
                     <p className="text-xs" style={{ color: "rgba(15,23,42,0.5)" }}>PDF, JPG, PNG</p>
                   </div>
                   <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileUpload} />
@@ -913,7 +916,7 @@ export default function AssistantPage() {
         ))}
         {interim && (
           <div className="flex justify-end">
-            <div className="max-w-[85%] rounded-2xl rounded-br-md bg-bharatlink-tealDark/60 px-4 py-2.5 text-sm text-white animate-pulse">
+            <div className="max-w-[85%] rounded-2xl rounded-br-md bg-orange-600/80 px-4 py-2.5 text-sm text-white animate-pulse">
               {interim}
             </div>
           </div>
@@ -921,19 +924,19 @@ export default function AssistantPage() {
         {uiState === "thinking" && (
           <div className="flex justify-start">
             <div
-              className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-              style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+              className="mr-2 mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-extrabold text-white shadow-md shadow-orange-500/30"
+              style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
             >
               BL
             </div>
             <div
               className="rounded-2xl px-4 py-3"
-              style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(20,184,166,0.2)", borderBottomLeftRadius: 4 }}
+              style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", border: "1px solid rgba(234,88,12,0.18)", borderBottomLeftRadius: 4 }}
             >
               <div className="flex gap-1.5 items-center">
                 {[0, 150, 300].map((delay) => (
                   <span key={delay} className="h-2 w-2 rounded-full"
-                    style={{ background: "#14b8a6", animation: "waveBar 1s ease-in-out infinite", animationDelay: `${delay}ms` }} />
+                    style={{ background: "#ea580c", animation: "waveBar 1s ease-in-out infinite", animationDelay: `${delay}ms` }} />
                 ))}
               </div>
             </div>
@@ -944,9 +947,9 @@ export default function AssistantPage() {
 
       {/* ── Quick PDF bar ── */}
       {filledFormFields && (phase === "offline-scan" || phase === "offline-fill" || phase === "offline-generate") && (
-        <div className="flex items-center gap-3 px-4 py-3" style={{ borderTop: "1px solid rgba(20,184,166,0.2)", background: "#f0fdfa" }}>
+        <div className="flex items-center gap-3 px-4 py-3" style={{ borderTop: "1px solid rgba(234,88,12,0.2)", background: "#fff7ed" }}>
           <div className="flex-1">
-            <p className="text-sm font-semibold" style={{ color: "#0f766e" }}>Form ready</p>
+            <p className="text-sm font-bold" style={{ color: "#ea580c" }}>Form ready</p>
             <p className="text-xs" style={{ color: "rgba(15,23,42,0.5)" }}>{Object.keys(filledFormFields).length} fields filled</p>
           </div>
           <button
@@ -967,8 +970,8 @@ export default function AssistantPage() {
                 setPhase("complete"); phaseRef.current = "complete";
               } catch { setError("PDF generation failed"); }
             }}
-            className="rounded-full px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:opacity-90"
-            style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+            className="rounded-full px-5 py-2 text-sm font-bold text-white shadow-md transition hover:opacity-90 glow-coral"
+            style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
           >
             Download PDF ↓
           </button>
@@ -1004,8 +1007,8 @@ export default function AssistantPage() {
           </button>
           {!screenAutoCapture && (
             <button type="button" onClick={() => captureScreenFrame()}
-              className="rounded-full px-3 py-1 text-xs font-medium text-white transition hover:opacity-90"
-              style={{ background: "#0f766e" }}>
+              className="rounded-full px-3 py-1 text-xs font-bold text-white transition hover:opacity-90 glow-coral"
+              style={{ background: "#ea580c" }}>
               What should I do?
             </button>
           )}
@@ -1018,32 +1021,32 @@ export default function AssistantPage() {
       )}
 
       {/* ── Input bar ── */}
-      <div className="px-4 pt-3 pb-5" style={{ borderTop: "1px solid rgba(20,184,166,0.15)", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)" }}>
+      <div className="px-4 pt-3 pb-5 glass-nav" style={{ borderTop: "1px solid rgba(234,88,12,0.18)" }}>
         {/* Tool row + big centered mic */}
         <div className="flex items-center justify-center gap-4">
 
           {/* Upload */}
           <div className="flex flex-col items-center gap-1">
-            <label className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full transition hover:scale-105" style={{ background: "var(--bl-sand)", color: "rgba(15,23,42,0.5)" }}>
+            <label className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full transition hover:scale-105 hover:bg-orange-500/10 hover:text-orange-600" style={{ background: "var(--bl-sand)", color: "rgba(15,23,42,0.6)" }}>
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
               </svg>
               <input type="file" accept="image/*,application/pdf" className="hidden" onChange={handleFileUpload} />
             </label>
-            <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.45)" }}>Upload</span>
+            <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.6)" }}>Upload</span>
           </div>
 
           {/* Scan */}
           <div className="flex flex-col items-center gap-1">
             <button type="button" onClick={() => { setCameraPurpose("form_scan"); openCamera(); }}
-              className="flex h-11 w-11 items-center justify-center rounded-full transition hover:scale-105"
-              style={{ background: "var(--bl-sand)", color: "rgba(15,23,42,0.5)" }}>
+              className="flex h-11 w-11 items-center justify-center rounded-full transition hover:scale-105 hover:bg-orange-500/10 hover:text-orange-600"
+              style={{ background: "var(--bl-sand)", color: "rgba(15,23,42,0.6)" }}>
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
               </svg>
             </button>
-            <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.45)" }}>Scan</span>
+            <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.6)" }}>Scan</span>
           </div>
 
           {/* ── BIG MIC BUTTON ── */}
@@ -1056,7 +1059,7 @@ export default function AssistantPage() {
                 data-cursor="mic"
                 onClick={toggleMic}
                 disabled={uiState === "thinking" || !isSTTAvailable()}
-                className={`relative flex h-[68px] w-[68px] items-center justify-center rounded-full shadow-xl transition-all hover:scale-105 disabled:opacity-40 ${uiState === "listening" ? "glow-coral" : ""}`}
+                className={`glow-coral relative flex h-[68px] w-[68px] items-center justify-center rounded-full shadow-xl transition-all hover:scale-105 disabled:opacity-40`}
                 style={{ background: micBg }}
               >
                 {uiState === "listening" ? (
@@ -1073,7 +1076,7 @@ export default function AssistantPage() {
                 )}
               </button>
             </div>
-            <span className="text-[10px] font-semibold" style={{ color: "#0f766e" }}>
+            <span className="text-[10px] font-bold" style={{ color: "#ea580c" }}>
               {uiState === "listening" ? "Tap to stop" : uiState === "speaking" ? "Tap to interrupt" : "Speak"}
             </span>
           </div>
@@ -1083,13 +1086,13 @@ export default function AssistantPage() {
             <button type="button"
               onClick={screenShareActive ? stopScreenShare : startScreenShare}
               className="flex h-11 w-11 items-center justify-center rounded-full transition hover:scale-105"
-              style={screenShareActive ? { background: "rgba(239,68,68,0.12)", color: "#dc2626" } : { background: "var(--bl-sand)", color: "rgba(15,23,42,0.5)" }}
+              style={screenShareActive ? { background: "rgba(239,68,68,0.12)", color: "#dc2626" } : { background: "var(--bl-sand)", color: "rgba(15,23,42,0.6)" }}
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
               </svg>
             </button>
-            <span className="text-[10px] font-medium" style={{ color: screenShareActive ? "#dc2626" : "rgba(15,23,42,0.45)" }}>
+            <span className="text-[10px] font-medium" style={{ color: screenShareActive ? "#dc2626" : "rgba(15,23,42,0.6)" }}>
               {screenShareActive ? "Stop" : "Screen"}
             </span>
           </div>
@@ -1104,14 +1107,14 @@ export default function AssistantPage() {
             type="text" value={textInput} onChange={(e) => setTextInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleTextSubmit(); }}
             placeholder="or type here…"
-            className="flex-1 rounded-full px-4 py-2 text-sm outline-none transition"
-            style={{ background: "rgba(15,23,42,0.05)", border: "1px solid rgba(20,184,166,0.2)", color: "#0f172a" }}
+            className="flex-1 rounded-full px-4 py-2 text-sm outline-none transition glass-card focus:border-orange-500"
+            style={{ color: "#0f172a" }}
             disabled={uiState === "thinking"}
           />
           {textInput.trim() && (
             <button type="button" onClick={handleTextSubmit} disabled={uiState === "thinking"}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-white shadow-md transition hover:scale-105 disabled:opacity-40"
-              style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+              className="glow-coral flex h-9 w-9 items-center justify-center rounded-full text-white shadow-md transition hover:scale-105 disabled:opacity-40"
+              style={{ background: "linear-gradient(135deg, #ea580c, #f97316)" }}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />

@@ -84,10 +84,10 @@ export default function EligibilityPage() {
       <main className="mx-auto max-w-3xl px-4 pb-24 pt-24 sm:px-6">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
+            <h1 className="font-display text-3xl font-extrabold text-bharatlink-navy sm:text-4xl">
               {getUiText(language, "Eligible schemes")}
             </h1>
-            <p className="mt-1 text-bharatlink-navy/60">
+            <p className="mt-1 text-bharatlink-navy/70">
               {loading
                 ? getUiText(language, "Loading…")
                 : getEligibilityHeaderText(
@@ -101,10 +101,10 @@ export default function EligibilityPage() {
             <button
               type="button"
               onClick={announcing ? () => { stopSpeaking(); setAnnouncing(false); } : announceResults}
-              className={`mt-1 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition ${
+              className={`mt-1 flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition ${
                 announcing
                   ? "bg-red-50 text-red-700 hover:bg-red-100"
-                  : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark/20"
+                  : "bg-orange-500/10 text-orange-600 hover:bg-orange-500/20"
               }`}
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -116,16 +116,16 @@ export default function EligibilityPage() {
         </div>
 
         {/* Category filter */}
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
+        <div className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => setFilter(cat)}
-              className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-medium capitalize transition ${
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold capitalize transition shadow-sm ${
                 filter === cat
-                  ? "bg-bharatlink-tealDark text-white"
-                  : "bg-bharatlink-sand/60 text-bharatlink-navy/70 hover:bg-bharatlink-sand"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/20 glow-coral"
+                  : "glass-card text-bharatlink-navy/70 hover:bg-white/60 hover:text-orange-600"
               }`}
             >
               {getCategoryLabel(language, cat)}
@@ -135,62 +135,62 @@ export default function EligibilityPage() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent shadow-[0_0_10px_#ea580c]" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-bharatlink-sand bg-white p-8 text-center">
-            <p className="text-bharatlink-navy/60">
+          <div className="rounded-2xl glass-card p-8 text-center border-orange-500/20">
+            <p className="text-bharatlink-navy/70 font-medium">
               {getUiText(language, "No matching schemes found.")}
             </p>
             <Link
               href="/onboarding/voice"
-              className="mt-3 inline-block text-sm font-medium text-bharatlink-tealDark hover:underline"
+              className="mt-3 inline-block text-sm font-bold text-orange-600 hover:underline"
             >
               {getUiText(language, "Complete your profile to see more →")}
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filtered.map(({ scheme, score, missingFields }, idx) => (
               <Link
                 key={scheme.id}
                 href={`/scheme/${scheme.id}`}
-                className="group block rounded-2xl border border-bharatlink-sand bg-white p-5 transition hover:border-bharatlink-tealDark hover:shadow-sm"
+                className="group block rounded-2xl glass-card p-5 transition hover:border-orange-500/50 hover:shadow-lg hover:-translate-y-0.5"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="rounded bg-bharatlink-sand/80 px-1.5 py-0.5 text-[10px] font-medium uppercase text-bharatlink-navy/50">
+                      <span className="rounded bg-slate-200/50 px-2 py-0.5 text-[10px] font-bold uppercase text-bharatlink-navy/50">
                         {getCategoryLabel(language, scheme.category)}
                       </span>
-                      <span className="rounded bg-bharatlink-tealLight/30 px-1.5 py-0.5 text-[10px] font-medium text-bharatlink-tealDark">
+                      <span className="rounded bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 text-[10px] font-bold text-orange-600">
                         {getBenefitLabel(language, scheme.benefitType)}
                       </span>
                     </div>
-                    <h3 className="mt-2 text-sm font-semibold text-bharatlink-navy group-hover:text-bharatlink-tealDark">
+                    <h3 className="mt-2 text-base font-bold text-bharatlink-navy group-hover:text-orange-600 transition">
                       {translatedNames[idx] ?? scheme.name}
                     </h3>
-                    <p className="mt-0.5 text-xs text-bharatlink-navy/50">{scheme.department}</p>
-                    <p className="mt-2 text-xs leading-relaxed text-bharatlink-navy/60 line-clamp-2">
+                    <p className="mt-0.5 text-xs font-medium text-bharatlink-navy/50">{scheme.department}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-bharatlink-navy/70 line-clamp-2">
                       {translatedDescs[idx] ?? scheme.description}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1.5">
-                    <span className="whitespace-nowrap rounded-full bg-bharatlink-tealLight/40 px-3 py-1 text-sm font-bold text-bharatlink-tealDark">
+                    <span className="whitespace-nowrap rounded-full bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 px-3 py-1.5 text-sm font-extrabold text-orange-600 shadow-sm">
                       ₹{scheme.estimatedBenefitINR.toLocaleString(locale)}
                     </span>
-                    <span className="text-[10px] font-medium text-bharatlink-navy/40">
+                    <span className="text-[11px] font-bold text-slate-400">
                       {Math.round(score * 100)}% {getMatchLabel(language)}
                     </span>
                   </div>
                 </div>
                 {missingFields.length > 0 && (
-                  <p className="mt-3 rounded-lg bg-amber-50 px-3 py-1.5 text-[10px] text-amber-700">
-                    {getUiText(language, "Missing info:")} {missingFields.join(", ")}
+                  <p className="mt-4 rounded-lg bg-amber-50/80 border border-amber-200/50 px-3 py-2 text-xs font-medium text-amber-700">
+                    {getUiText(language, "Missing info:")} <span className="font-bold">{missingFields.join(", ")}</span>
                   </p>
                 )}
-                <div className="mt-3 text-xs font-medium text-bharatlink-tealDark opacity-0 transition group-hover:opacity-100">
-                  {getUiText(language, "Apply now →")}
+                <div className="mt-4 text-xs font-bold text-orange-600 opacity-0 transition group-hover:opacity-100 flex items-center gap-1">
+                  {getUiText(language, "Apply now")} <span className="text-lg leading-none">→</span>
                 </div>
               </Link>
             ))}
@@ -198,7 +198,7 @@ export default function EligibilityPage() {
         )}
 
         <div className="mt-8 flex gap-4">
-          <Link href="/dashboard" className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline">
+          <Link href="/dashboard" className="text-sm font-bold text-orange-600 underline-offset-4 hover:underline">
             {`← ${getUiText(language, "Dashboard")}`}
           </Link>
         </div>

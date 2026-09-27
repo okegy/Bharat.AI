@@ -170,7 +170,7 @@ export default function AadhaarScanPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 px-6 pb-24 pt-28">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
+        <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
           {getUiText(language, "Optional · Aadhaar Scan")}
         </p>
         <h1 className="mt-2 font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
@@ -195,7 +195,7 @@ export default function AadhaarScanPage() {
           <button
             type="button"
             onClick={() => void startCamera()}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+            className="glow-coral inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 px-6 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -213,7 +213,7 @@ export default function AadhaarScanPage() {
       )}
 
       {state === "camera" && (
-        <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-bharatlink-tealDark/30 bg-black">
+        <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-orange-500/30 bg-black">
           <video ref={videoRef} className="w-full" autoPlay playsInline muted />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="h-48 w-72 rounded-xl border-2 border-white/60 shadow-lg sm:h-56 sm:w-80" />
@@ -222,9 +222,9 @@ export default function AadhaarScanPage() {
             <button
               type="button"
               onClick={() => void captureAndProcess()}
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-105"
+              className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-[0_0_20px_#ea580c] transition hover:scale-105"
             >
-              <div className="h-12 w-12 rounded-full border-4 border-bharatlink-tealDark" />
+              <div className="h-12 w-12 rounded-full border-4 border-orange-600" />
             </button>
             <button
               type="button"
@@ -240,7 +240,7 @@ export default function AadhaarScanPage() {
 
       {state === "processing" && (
         <div className="flex flex-col items-center gap-4 py-12">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent shadow-[0_0_10px_#ea580c]" />
           <p className="text-sm text-bharatlink-navy/60">
             {getUiText(language, "Scanning Aadhaar card…")}
           </p>
@@ -249,7 +249,7 @@ export default function AadhaarScanPage() {
 
       {state === "done" && (
         <div className="flex flex-col gap-4">
-          <p className="text-sm font-medium text-bharatlink-tealDark">
+          <p className="text-sm font-bold text-orange-600">
             {getUiText(language, "Fill in or correct the details below, then continue.")}
           </p>
           {(
@@ -271,7 +271,7 @@ export default function AadhaarScanPage() {
                 type="text"
                 value={manualFields[key] ?? extracted[key] ?? ""}
                 onChange={(e) => handleFieldChange(key, e.target.value)}
-                className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
+                className="glass-card w-full rounded-xl border border-orange-500/20 px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30"
               />
             </div>
           ))}
@@ -280,7 +280,7 @@ export default function AadhaarScanPage() {
               <button
                 type="button"
                 onClick={() => void saveAndContinue()}
-                className="flex-1 rounded-full bg-bharatlink-tealDark py-3 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+                className="glow-coral flex-1 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
               >
                 {getUiText(language, "Save & continue")}
               </button>
@@ -300,7 +300,7 @@ export default function AadhaarScanPage() {
                   setState("idle");
                   void startCamera();
                 }}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-bharatlink-tealDark/30 px-6 py-2.5 text-sm font-medium text-bharatlink-tealDark transition hover:bg-bharatlink-tealLight/20"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-orange-500/30 px-6 py-2.5 text-sm font-bold text-orange-600 transition hover:bg-orange-500/10"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />

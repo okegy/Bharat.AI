@@ -31,11 +31,11 @@ export function TopBar() {
         </Link>
         <div className="flex items-center gap-3">
           <CursorToggle />
-          <LanguagePickerNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-bharatlink-tealDark hover:underline">
+          <LanguagePickerNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-orange-600 hover:underline">
             {getUiText(language, "Language")}
           </LanguagePickerNavLink>
           {showBiometric ? (
-            <BiometricSetupNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-bharatlink-tealDark hover:underline">
+            <BiometricSetupNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-orange-600 hover:underline">
               {getUiText(language, "Fingerprint")}
             </BiometricSetupNavLink>
           ) : null}
@@ -43,7 +43,7 @@ export function TopBar() {
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "h-9 w-9 ring-2 ring-bharatlink-tealLight/60",
+                  avatarBox: "h-9 w-9 ring-2 ring-orange-500/40 shadow-sm",
                 },
               }}
             />

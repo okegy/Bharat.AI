@@ -272,8 +272,8 @@ export default function SamplesPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20 text-xs font-semibold uppercase tracking-wider mb-2">
-              Testing &amp; Evaluation Kit
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20 text-xs font-bold uppercase tracking-wider mb-2">
+              🧪 Testing &amp; Evaluation Kit
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Sample Documents &amp; Forms
@@ -285,7 +285,7 @@ export default function SamplesPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/assistant"
-              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-teal-500/20 transition hover:from-teal-500 hover:to-emerald-500"
+              className="glow-coral inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
             >
               <span>Go to AI Assistant</span>
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -296,12 +296,12 @@ export default function SamplesPage() {
         </div>
 
         {/* Tab Bar */}
-        <div className="flex gap-2 p-1 rounded-xl bg-slate-900/60 border border-slate-800 w-fit">
+        <div className="flex gap-2 p-1 rounded-xl bg-slate-900/80 border border-slate-800 w-fit">
           <button
             onClick={() => setActiveTab("mock")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
               activeTab === "mock"
-                ? "bg-teal-600 text-white shadow"
+                ? "bg-orange-600 text-white shadow-md shadow-orange-600/30"
                 : "text-slate-400 hover:text-white hover:bg-slate-800"
             }`}
           >
@@ -309,9 +309,9 @@ export default function SamplesPage() {
           </button>
           <button
             onClick={() => setActiveTab("pdf")}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition ${
               activeTab === "pdf"
-                ? "bg-indigo-600 text-white shadow"
+                ? "bg-orange-600 text-white shadow-md shadow-orange-600/30"
                 : "text-slate-400 hover:text-white hover:bg-slate-800"
             }`}
           >
@@ -336,9 +336,7 @@ export default function SamplesPage() {
                     onClick={() => setSelected(item)}
                     className={`cursor-pointer rounded-2xl p-4 transition border ${
                       isSelected
-                        ? activeTab === "mock"
-                          ? "bg-slate-900/90 border-teal-500 shadow-xl shadow-teal-500/10 ring-1 ring-teal-500"
-                          : "bg-slate-900/90 border-indigo-500 shadow-xl shadow-indigo-500/10 ring-1 ring-indigo-500"
+                        ? "bg-slate-900/90 border-orange-500 shadow-xl shadow-orange-500/15 ring-1 ring-orange-500"
                         : "bg-slate-900/40 border-slate-800 hover:bg-slate-900/70 hover:border-slate-700"
                     }`}
                   >
@@ -346,7 +344,7 @@ export default function SamplesPage() {
                       <div className="flex items-start gap-3">
                         <span className="text-2xl mt-0.5">{item.emoji}</span>
                         <div>
-                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-teal-300 mb-1.5">
+                          <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-orange-500/15 border border-orange-500/20 text-orange-300 mb-1.5">
                             {item.category}
                           </span>
                           <h3 className="font-bold text-white text-sm leading-snug">{item.title}</h3>
@@ -354,7 +352,7 @@ export default function SamplesPage() {
                         </div>
                       </div>
                       <span className={`h-2.5 w-2.5 rounded-full mt-1 shrink-0 ${isSelected
-                        ? activeTab === "mock" ? "bg-teal-400 animate-pulse" : "bg-indigo-400 animate-pulse"
+                        ? "bg-orange-500 shadow-[0_0_8px_#ea580c] animate-pulse"
                         : "bg-slate-700"}`}
                       />
                     </div>
@@ -364,8 +362,8 @@ export default function SamplesPage() {
             </div>
 
             {/* How to Test */}
-            <div className="rounded-2xl bg-teal-950/30 border border-teal-800/40 p-4 text-xs text-teal-200/90 space-y-2">
-              <div className="font-semibold flex items-center gap-1.5 text-teal-300">
+            <div className="rounded-2xl bg-orange-950/20 border border-orange-800/30 p-4 text-xs text-orange-200/90 space-y-2">
+              <div className="font-semibold flex items-center gap-1.5 text-orange-400">
                 <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                 </svg>
@@ -387,7 +385,7 @@ export default function SamplesPage() {
 
           {/* Right Column */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 space-y-4">
+            <div className="rounded-2xl glass-dark border border-slate-800 p-5 space-y-4">
 
               {/* Card Title */}
               <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
@@ -411,7 +409,7 @@ export default function SamplesPage() {
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-semibold text-white transition flex items-center gap-1"
+                    className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition flex items-center gap-1 border border-slate-700"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
@@ -441,14 +439,14 @@ export default function SamplesPage() {
 
               {/* Info Cards */}
               <div className="space-y-2 pt-2">
-                <h4 className="text-xs font-semibold uppercase tracking-wider text-teal-400">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-orange-400">
                   {activeTab === "mock" ? "Expected Extracted Data" : "Scheme Information"}
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   {Object.entries(currentItem.dataFields).map(([label, val]) => (
-                    <div key={label} className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800/80">
+                    <div key={label} className="p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80">
                       <span className="text-slate-400 block text-[11px] font-medium">{label}</span>
-                      <span className="text-slate-100 font-semibold mt-0.5 block">{val}</span>
+                      <span className="text-slate-100 font-bold mt-0.5 block">{val}</span>
                     </div>
                   ))}
                 </div>
@@ -456,16 +454,12 @@ export default function SamplesPage() {
 
               {/* Action Bar */}
               <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-400">
                   {activeTab === "mock" ? "Ready for OCR & Vision agents" : "Real government form · AI autofill ready"}
                 </span>
                 <Link
                   href={currentItem.testTargetUrl}
-                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold text-white transition shadow-md ${
-                    activeTab === "mock"
-                      ? "bg-teal-600 hover:bg-teal-500"
-                      : "bg-indigo-600 hover:bg-indigo-500"
-                  }`}
+                  className="glow-coral inline-flex items-center gap-2 rounded-xl bg-orange-600 hover:bg-orange-500 px-4 py-2 text-xs font-bold text-white transition shadow-md shadow-orange-600/30"
                 >
                   <span>{activeTab === "mock" ? "Launch in Scanner" : "Try AI Autofill"}</span>
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -482,4 +476,3 @@ export default function SamplesPage() {
     </main>
   );
 }
-

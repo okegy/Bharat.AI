@@ -188,7 +188,7 @@ export default function VoiceOnboardingPage() {
   if (saving) {
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col items-center justify-center gap-4 px-6 pb-24 pt-28">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent shadow-[0_0_10px_#ea580c]" />
         <p className="text-bharatlink-navy/60">
           {t("common.savingProfile")}
         </p>
@@ -199,7 +199,7 @@ export default function VoiceOnboardingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-6 px-6 pb-24 pt-28">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
+        <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
           {getQuestionProgressText(language, step + 1, questionOrder.length)}
         </p>
         <h1 className="mt-2 font-display text-2xl font-semibold text-bharatlink-navy sm:text-3xl">
@@ -217,7 +217,7 @@ export default function VoiceOnboardingPage() {
               key={option.value}
               type="button"
               onClick={() => submitAnswer(option.value)}
-              className="rounded-full border border-bharatlink-sand bg-white px-4 py-2 text-sm font-medium text-bharatlink-navy transition hover:border-bharatlink-tealDark hover:bg-bharatlink-tealLight/20"
+              className="glass-card rounded-full border border-orange-500/20 px-4 py-2 text-sm font-semibold text-bharatlink-navy transition hover:border-orange-500 hover:bg-white/60 hover:text-orange-600 shadow-sm"
             >
               {option.label}
             </button>
@@ -234,13 +234,13 @@ export default function VoiceOnboardingPage() {
             if (e.key === "Enter") submitAnswer(textInput);
           }}
           placeholder={getOnboardingPlaceholder(language, currentQ)}
-          className="flex-1 rounded-xl border border-bharatlink-sand bg-white px-4 py-3 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
+          className="glass-card flex-1 rounded-xl border border-orange-500/20 px-4 py-3 text-sm text-bharatlink-navy outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 shadow-sm"
         />
         <button
           type="button"
           onClick={() => submitAnswer(textInput)}
           disabled={!textInput.trim() && !interim}
-          className="rounded-xl bg-bharatlink-tealDark px-5 py-3 text-sm font-semibold text-white transition hover:bg-bharatlink-navy disabled:opacity-40"
+          className="glow-coral rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 px-5 py-3 text-sm font-bold text-white transition hover:from-orange-500 hover:to-amber-500 disabled:opacity-40 shadow-lg shadow-orange-500/25 hover:scale-[1.02]"
         >
           {getUiText(language, "Next")}
         </button>
@@ -263,7 +263,7 @@ export default function VoiceOnboardingPage() {
                 ? "bg-amber-100 text-amber-600"
                 : listening
                   ? "animate-pulse bg-red-500 text-white shadow-lg shadow-red-500/30"
-                  : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark/20"
+                  : "bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white"
             }`}
             aria-label={listening ? getUiText(language, "Stop") : getUiText(language, "Voice")}
           >
@@ -292,7 +292,7 @@ export default function VoiceOnboardingPage() {
           <button
             type="button"
             onClick={speakQuestion}
-            className="ml-auto flex items-center gap-1.5 text-sm font-medium text-bharatlink-tealDark hover:underline"
+            className="ml-auto flex items-center gap-1.5 text-sm font-bold text-orange-600 hover:underline"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
@@ -312,7 +312,7 @@ export default function VoiceOnboardingPage() {
               setTextInput("");
               setInterim("");
             }}
-            className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
+            className="text-sm font-bold text-orange-600 underline-offset-4 hover:underline"
           >
             {`← ${getUiText(language, "Previous")}`}
           </button>
@@ -330,7 +330,7 @@ export default function VoiceOnboardingPage() {
           <div
             key={i}
             className={`h-1.5 flex-1 rounded-full transition ${
-              i < step ? "bg-bharatlink-tealDark" : i === step ? "bg-bharatlink-tealLight" : "bg-bharatlink-sand"
+              i < step ? "bg-orange-600" : i === step ? "bg-orange-300" : "bg-orange-500/10"
             }`}
           />
         ))}

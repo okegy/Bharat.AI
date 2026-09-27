@@ -154,8 +154,8 @@ export default function Home() {
       <ResumeOnboardingRedirect />
       <main>
         <section className="relative overflow-hidden bg-hero-mesh px-4 pb-20 pt-28 sm:px-6 sm:pb-28 sm:pt-32">
-          <div className="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-bharatlink-tealLight/40 blur-3xl" />
-          <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-bharatlink-terracotta/15 blur-3xl" />
+          <div className="pointer-events-none absolute -right-24 top-20 h-72 w-72 rounded-full bg-orange-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-amber-500/15 blur-3xl" />
 
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div className="relative z-10">

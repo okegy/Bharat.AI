@@ -84,7 +84,7 @@ export default function LanguageOnboardingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 pb-24 pt-28 sm:px-6">
       <div className="mb-10 text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
+        <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
           {getUiText(language, "Step 2 of 3")}
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
@@ -104,10 +104,10 @@ export default function LanguageOnboardingPage() {
               <button
                 type="button"
                 onClick={() => choose(lang.code)}
-                className={`flex w-full flex-col items-center rounded-2xl border px-4 py-5 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bharatlink-tealDark ${
+                className={`glass-card flex w-full flex-col items-center rounded-2xl border px-4 py-5 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 ${
                   active
-                    ? "border-bharatlink-tealDark bg-white shadow-md ring-1 ring-bharatlink-tealLight/50"
-                    : "border-bharatlink-sand bg-bharatlink-cream/40 hover:border-bharatlink-tealLight/70 hover:bg-white"
+                    ? "border-orange-500 bg-orange-50/50 shadow-md ring-1 ring-orange-500/30 glow-coral"
+                    : "border-orange-500/20 bg-slate-50/40 hover:border-orange-400 hover:bg-white/60 hover:-translate-y-0.5"
                 }`}
               >
                 <span className="text-lg font-semibold text-bharatlink-navy">
@@ -131,7 +131,7 @@ export default function LanguageOnboardingPage() {
 
       <Link
         href="/"
-        className="mt-6 text-center text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
+        className="mt-6 text-center text-sm font-bold text-orange-600 underline-offset-4 hover:underline"
       >
         {`← ${getUiText(language, "Back to home")}`}
       </Link>

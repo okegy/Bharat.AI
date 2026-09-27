@@ -235,7 +235,7 @@ export default function SchemeFormPage() {
       <>
         <TopBar />
         <main className="mx-auto flex min-h-screen max-w-2xl items-center justify-center px-6 pt-28">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent shadow-[0_0_10px_#ea580c]" />
         </main>
       </>
     );
@@ -277,13 +277,13 @@ export default function SchemeFormPage() {
           <div className="flex gap-4">
             <Link
               href="/dashboard"
-              className="rounded-full bg-bharatlink-tealDark px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+              className="glow-coral rounded-full bg-gradient-to-r from-orange-600 to-amber-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
             >
               {getUiText(language, "Dashboard")}
             </Link>
             <Link
               href="/eligibility"
-              className="rounded-full border border-bharatlink-sand px-6 py-2.5 text-sm font-medium text-bharatlink-navy hover:bg-white"
+              className="glass-card rounded-full border border-orange-500/20 px-6 py-2.5 text-sm font-semibold text-bharatlink-navy hover:bg-white/60 hover:text-orange-600 transition"
             >
               {t("scheme.moreSchemes")}
             </Link>
@@ -378,7 +378,7 @@ export default function SchemeFormPage() {
                   "noopener,noreferrer",
                 )
               }
-              className="flex items-center gap-1.5 rounded-full bg-bharatlink-tealDark px-4 py-2 text-xs font-semibold text-white transition hover:bg-bharatlink-navy"
+              className="flex items-center gap-1.5 rounded-full bg-orange-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-orange-500 shadow-md glow-coral"
             >
               <ExternalLinkIcon />
               {t("scheme.openPortalAgain")}
@@ -394,10 +394,10 @@ export default function SchemeFormPage() {
                       }
                     : narrateFieldByField
                 }
-                className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition ${
+                className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition ${
                   narrating
                     ? "bg-red-50 text-red-700"
-                    : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark/20"
+                    : "bg-orange-500/10 text-orange-600 hover:bg-orange-500/20"
                 }`}
               >
                 <SpeakerIcon />
@@ -408,7 +408,7 @@ export default function SchemeFormPage() {
               <button
                 type="button"
                 onClick={() => askForMissing(emptyFields[0]!, emptyFields)}
-                className="flex items-center gap-1.5 rounded-full bg-bharatlink-tealDark/10 px-4 py-2 text-xs font-semibold text-bharatlink-tealDark transition hover:bg-bharatlink-tealDark/20"
+                className="flex items-center gap-1.5 rounded-full bg-orange-500/10 px-4 py-2 text-xs font-bold text-orange-600 transition hover:bg-orange-500/20"
               >
                 <MicIcon />
                 {t("scheme.fillMissingCount", { count: emptyFields.length })}
@@ -435,7 +435,7 @@ export default function SchemeFormPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-bharatlink-tealDark/10 text-[10px] font-bold text-bharatlink-tealDark">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500/15 text-[10px] font-bold text-orange-600 shadow-sm">
                           {idx + 1}
                         </span>
                         <p className="text-xs font-medium text-bharatlink-navy/60">
@@ -469,10 +469,10 @@ export default function SchemeFormPage() {
                       <button
                         type="button"
                         onClick={() => copyToClipboard(field.id, val)}
-                        className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+                        className={`shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
                           isCopied
-                            ? "bg-green-600 text-white"
-                            : "bg-bharatlink-tealDark/10 text-bharatlink-tealDark hover:bg-bharatlink-tealDark hover:text-white"
+                            ? "bg-green-500 text-white shadow-sm"
+                            : "bg-orange-500/10 text-orange-600 hover:bg-orange-500 hover:text-white"
                         }`}
                       >
                         {isCopied ? (
@@ -515,13 +515,13 @@ export default function SchemeFormPage() {
             <button
               type="button"
               onClick={() => void markDone()}
-              className="flex-1 rounded-full bg-bharatlink-tealDark py-3 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+              className="glow-coral flex-1 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 py-3 text-sm font-bold text-white shadow-md transition hover:from-orange-500 hover:to-amber-500"
             >
               {t("scheme.markDone")}
             </button>
             <Link
               href="/dashboard"
-              className="flex items-center justify-center rounded-full border border-bharatlink-sand px-6 py-3 text-sm font-medium text-bharatlink-navy hover:bg-white"
+              className="glass-card flex items-center justify-center rounded-full border border-orange-500/20 px-6 py-3 text-sm font-semibold text-bharatlink-navy hover:bg-white/60 hover:text-orange-600 transition"
             >
               {getUiText(language, "Back")}
             </Link>
@@ -539,10 +539,10 @@ export default function SchemeFormPage() {
         {/* Scheme header */}
         <div className="mb-6">
           <div className="flex items-center gap-2">
-            <span className="rounded bg-bharatlink-sand/80 px-1.5 py-0.5 text-[10px] font-medium uppercase text-bharatlink-navy/50">
+            <span className="rounded bg-slate-200/50 px-2 py-0.5 text-[10px] font-bold uppercase text-bharatlink-navy/50">
               {scheme.category}
             </span>
-            <span className="rounded bg-bharatlink-tealLight/30 px-1.5 py-0.5 text-[10px] font-medium text-bharatlink-tealDark">
+            <span className="rounded bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 text-[10px] font-bold text-orange-600 shadow-sm">
               ₹{scheme.estimatedBenefitINR.toLocaleString(locale)}
             </span>
           </div>
@@ -570,11 +570,11 @@ export default function SchemeFormPage() {
         )}
 
         {/* Portal link preview */}
-        <div className="mb-6 rounded-2xl border border-bharatlink-sand bg-bharatlink-cream/50 px-4 py-3">
-          <p className="text-xs text-bharatlink-navy/50">
+        <div className="mb-6 rounded-2xl glass-card border-orange-500/20 px-4 py-3">
+          <p className="text-xs font-medium text-bharatlink-navy/50">
             {t("scheme.officialPortal")}
           </p>
-          <p className="text-sm font-medium text-bharatlink-tealDark">
+          <p className="text-sm font-bold text-orange-600">
             {scheme.portalUrl}
           </p>
         </div>
@@ -631,7 +631,7 @@ export default function SchemeFormPage() {
             <button
               type="button"
               onClick={() => askForMissing(emptyFields[0]!, emptyFields)}
-              className="flex items-center gap-1.5 rounded-full bg-bharatlink-tealDark/10 px-4 py-2 text-xs font-semibold text-bharatlink-tealDark transition hover:bg-bharatlink-tealDark/20"
+              className="flex items-center gap-1.5 rounded-full bg-orange-500/10 px-4 py-2 text-xs font-bold text-orange-600 transition hover:bg-orange-500/20"
             >
               <MicIcon />
               {t("scheme.fillMissingCount", { count: emptyFields.length })}
@@ -667,7 +667,7 @@ export default function SchemeFormPage() {
                   onChange={(e) =>
                     setFieldValue(field.id, e.target.value, "manual")
                   }
-                  className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
+                  className="w-full rounded-xl glass-card border border-orange-500/20 px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30"
                 >
                   <option value="">{getUiText(language, "Select…")}</option>
                   {field.options.map((opt) => (
@@ -683,7 +683,7 @@ export default function SchemeFormPage() {
                     setFieldValue(field.id, e.target.value, "manual")
                   }
                   rows={3}
-                  className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
+                  className="w-full rounded-xl glass-card border border-orange-500/20 px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30"
                 />
               ) : (
                 <input
@@ -698,7 +698,7 @@ export default function SchemeFormPage() {
                   onChange={(e) =>
                     setFieldValue(field.id, e.target.value, "manual")
                   }
-                  className="w-full rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-bharatlink-tealDark focus:ring-1 focus:ring-bharatlink-tealLight"
+                  className="w-full rounded-xl glass-card border border-orange-500/20 px-4 py-2.5 text-sm text-bharatlink-navy outline-none transition focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30"
                 />
               )}
             </div>
@@ -720,7 +720,7 @@ export default function SchemeFormPage() {
                 {doc}
                 <Link
                   href="/documents"
-                  className="ml-auto text-bharatlink-tealDark hover:underline"
+                  className="ml-auto text-orange-600 font-bold hover:underline"
                 >
                   {getUiText(language, "Upload")}
                 </Link>
@@ -734,14 +734,14 @@ export default function SchemeFormPage() {
           <button
             type="button"
             onClick={openPortal}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-bharatlink-tealDark py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+            className="glow-coral flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 py-3.5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
           >
             <ExternalLinkIcon />
             {t("scheme.openPortal")}
           </button>
           <Link
             href="/eligibility"
-            className="flex items-center justify-center rounded-full border border-bharatlink-sand px-6 py-3 text-sm font-medium text-bharatlink-navy hover:bg-white"
+            className="glass-card flex items-center justify-center rounded-full border border-orange-500/20 px-6 py-3 text-sm font-semibold text-bharatlink-navy hover:bg-white/60 hover:text-orange-600 transition"
           >
             {getUiText(language, "Back")}
           </Link>
@@ -844,7 +844,7 @@ function MicIcon() {
 function DocIcon() {
   return (
     <svg
-      className="h-4 w-4 text-bharatlink-tealDark"
+      className="h-4 w-4 text-orange-600"
       fill="none"
       viewBox="0 0 24 24"
       strokeWidth={1.5}

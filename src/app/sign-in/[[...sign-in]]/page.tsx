@@ -37,7 +37,7 @@ export default function SignInPage() {
       </div>
       <Link
         href="/"
-        className="mt-10 text-sm font-medium text-bharatlink-tealDark/80 underline-offset-4 hover:text-bharatlink-tealDark hover:underline"
+        className="mt-10 text-sm font-bold text-orange-600/80 underline-offset-4 hover:text-orange-600 hover:underline"
       >
         {`← ${getUiText(language, "Back to home")}`}
       </Link>

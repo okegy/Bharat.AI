@@ -138,7 +138,7 @@ export default function BiometricOnboardingPage() {
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 pb-24 pt-28">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
+          <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
             {t("biometric.thisDevice")}
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
@@ -150,7 +150,7 @@ export default function BiometricOnboardingPage() {
         </div>
         <Link
           href="/onboarding"
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+          className="glow-coral inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-gradient-to-r from-orange-600 to-amber-600 px-6 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
         >
           {t("biometric.backToOnboarding")}
         </Link>
@@ -162,7 +162,7 @@ export default function BiometricOnboardingPage() {
     return (
       <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 pb-24 pt-28">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
+          <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
             {t("biometric.thisDevice")}
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
@@ -174,7 +174,7 @@ export default function BiometricOnboardingPage() {
         </div>
         <Link
           href="/onboarding"
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+          className="glow-coral inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-gradient-to-r from-orange-600 to-amber-600 px-6 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
         >
           {t("biometric.backToOnboarding")}
         </Link>
@@ -199,7 +199,7 @@ export default function BiometricOnboardingPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-8 px-6 pb-24 pt-28">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-bharatlink-tealDark">
+        <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
           {stepLabel}
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
@@ -226,7 +226,7 @@ export default function BiometricOnboardingPage() {
           type="button"
           disabled={busy}
           onClick={() => void onRegister()}
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-bharatlink-tealDark px-6 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy disabled:opacity-50"
+          className="glow-coral inline-flex h-12 min-w-[200px] items-center justify-center rounded-full bg-gradient-to-r from-orange-600 to-amber-600 px-6 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02] disabled:opacity-50"
         >
           {busy
             ? t("biometric.waitingForDevice")
@@ -238,7 +238,7 @@ export default function BiometricOnboardingPage() {
           type="button"
           disabled={busy}
           onClick={onSkip}
-          className="inline-flex h-12 items-center justify-center rounded-full border border-bharatlink-sand px-6 text-sm font-semibold text-bharatlink-navy hover:bg-white disabled:opacity-50"
+          className="glass-card inline-flex h-12 items-center justify-center rounded-full border border-orange-500/20 px-6 text-sm font-semibold text-bharatlink-navy hover:bg-white/60 hover:text-orange-600 disabled:opacity-50 transition"
         >
           {settingsEntry
             ? t("biometric.notNowBack")
@@ -257,7 +257,7 @@ export default function BiometricOnboardingPage() {
             i18nKey="biometric.fingerprintAnytime"
             components={{
               1: (
-                <BiometricSetupNavLink className="font-medium text-bharatlink-tealDark underline-offset-2 hover:underline">
+                <BiometricSetupNavLink className="font-bold text-orange-600 underline-offset-2 hover:underline">
                   {t("nav.fingerprint")}
                 </BiometricSetupNavLink>
               ),
@@ -270,13 +270,13 @@ export default function BiometricOnboardingPage() {
         <Link
           href="/onboarding/language"
           onClick={() => markLanguagePickerRepick()}
-          className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
+          className="text-sm font-bold text-orange-600 underline-offset-4 hover:underline"
         >
           {t("nav.changeLanguage")}
         </Link>
         <Link
           href="/"
-          className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline"
+          className="text-sm font-bold text-orange-600 underline-offset-4 hover:underline"
         >
           {`← ${t("nav.backToHome")}`}
         </Link>

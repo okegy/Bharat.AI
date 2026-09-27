@@ -11,12 +11,17 @@ const config: Config = {
       colors: {
         bharatlink: {
           navy: "#0f172a",
-          tealDark: "#0f766e",
-          teal: "#14b8a6",
-          tealLight: "#ccfbf1",
+          tealDark: "#ea580c",
+          teal: "#f97316",
+          tealLight: "#ffedd5",
+          coral: "#ea580c",
+          coralLight: "#ffedd5",
+          coralDark: "#c2410c",
           terracotta: "#ea580c",
           cream: "#fdfbf7",
-          sand: "#f3ede4",
+          sand: "#f1f5f9",
+          slateDark: "#0f172a",
+          slateCard: "rgba(30, 41, 59, 0.7)",
         },
       },
       fontFamily: {
@@ -25,7 +30,7 @@ const config: Config = {
       },
       backgroundImage: {
         "hero-mesh":
-          "radial-gradient(ellipse 110% 70% at 55% -10%, rgba(20,184,166,0.18), transparent 55%), radial-gradient(ellipse 70% 55% at 100% 0%, rgba(234,88,12,0.10), transparent 55%)",
+          "radial-gradient(ellipse 110% 70% at 55% -10%, rgba(234,88,12,0.15), transparent 55%), radial-gradient(ellipse 70% 55% at 100% 0%, rgba(249,115,22,0.10), transparent 55%)",
       },
       animation: {
         float: "float 5s ease-in-out infinite",

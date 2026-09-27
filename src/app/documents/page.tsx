@@ -169,10 +169,10 @@ export default function DocumentsPage() {
     <>
       <TopBar />
       <main className="mx-auto max-w-2xl px-4 pb-24 pt-24 sm:px-6">
-        <h1 className="font-display text-3xl font-semibold text-bharatlink-navy sm:text-4xl">
+        <h1 className="font-display text-3xl font-extrabold text-bharatlink-navy sm:text-4xl">
           {getUiText(language, "Document Vault")}
         </h1>
-        <p className="mt-1 text-sm text-bharatlink-navy/60">
+        <p className="mt-1 text-sm text-bharatlink-navy/70">
           {getUiText(
             language,
             "Capture and store documents on your device. Encrypted, never sent to any server.",
@@ -186,7 +186,7 @@ export default function DocumentsPage() {
               <select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
-                className="flex-1 rounded-xl border border-bharatlink-sand bg-white px-4 py-2.5 text-sm text-bharatlink-navy outline-none focus:border-bharatlink-tealDark"
+                className="flex-1 rounded-xl border border-orange-500/20 glass-card px-4 py-2.5 text-sm text-bharatlink-navy outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30"
               >
                 {DOC_TYPES.map((dt) => (
                   <option key={dt.value} value={dt.value}>
@@ -197,7 +197,7 @@ export default function DocumentsPage() {
               <button
                 type="button"
                 onClick={() => void startCamera()}
-                className="flex items-center gap-2 rounded-full bg-bharatlink-tealDark px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+                className="glow-coral flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500 hover:scale-[1.02]"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
@@ -210,14 +210,14 @@ export default function DocumentsPage() {
             {/* Document list */}
             {loading ? (
               <div className="mt-12 flex justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent shadow-[0_0_10px_#ea580c]" />
               </div>
             ) : docs.length === 0 ? (
-              <div className="mt-12 rounded-2xl border border-dashed border-bharatlink-sand bg-white p-8 text-center">
-                <p className="text-bharatlink-navy/50">
+              <div className="mt-12 rounded-2xl border border-dashed border-orange-500/20 glass-card p-8 text-center">
+                <p className="text-bharatlink-navy/60 font-medium">
                   {getUiText(language, "No documents captured yet.")}
                 </p>
-                <p className="mt-1 text-xs text-bharatlink-navy/40">
+                <p className="mt-1 text-xs text-bharatlink-navy/45">
                   {getUiText(language, "Use the camera button above to scan a document.")}
                 </p>
               </div>
@@ -226,17 +226,17 @@ export default function DocumentsPage() {
                 {docs.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center gap-4 rounded-2xl border border-bharatlink-sand bg-white p-4"
+                    className="flex items-center gap-4 rounded-2xl glass-card p-4 transition hover:border-orange-500/40"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={doc.imageData}
                       alt={doc.label}
-                      className="h-16 w-24 rounded-lg border border-bharatlink-sand object-cover"
+                      className="h-16 w-24 rounded-xl border border-orange-500/20 object-cover shadow-sm"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-bharatlink-navy">{doc.label}</p>
-                      <p className="text-xs text-bharatlink-navy/50">
+                      <p className="truncate text-sm font-bold text-bharatlink-navy">{doc.label}</p>
+                      <p className="text-xs text-bharatlink-navy/60 font-medium">
                         {getDocumentMetaText(
                           language,
                           new Date(doc.capturedAt).toLocaleDateString(locale),
@@ -247,7 +247,7 @@ export default function DocumentsPage() {
                     <button
                       type="button"
                       onClick={() => void handleDelete(doc.id)}
-                      className="text-xs text-red-500 hover:underline"
+                      className="text-xs font-semibold text-red-500 hover:text-red-700 hover:underline"
                     >
                       {getUiText(language, "Delete")}
                     </button>
@@ -257,7 +257,7 @@ export default function DocumentsPage() {
             )}
 
             <div className="mt-8">
-              <Link href="/dashboard" className="text-sm font-medium text-bharatlink-tealDark underline-offset-4 hover:underline">
+              <Link href="/dashboard" className="text-sm font-semibold text-orange-600 underline-offset-4 hover:underline">
                 {`← ${getUiText(language, "Dashboard")}`}
               </Link>
             </div>
@@ -265,30 +265,30 @@ export default function DocumentsPage() {
         )}
 
         {state === "camera" && (
-          <div className="relative mt-6 overflow-hidden rounded-2xl border-2 border-dashed border-bharatlink-tealDark/30 bg-black">
+          <div className="relative mt-6 overflow-hidden rounded-2xl border-2 border-dashed border-orange-500/40 bg-black shadow-2xl">
             <video ref={videoRef} className="w-full" autoPlay playsInline muted />
             {/* Framing overlay */}
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="h-52 w-80 rounded-xl border-2 border-white/60 shadow-lg sm:h-60 sm:w-96" />
+              <div className="h-52 w-80 rounded-2xl border-2 border-orange-400/80 shadow-2xl sm:h-60 sm:w-96 ring-1 ring-white/30" />
             </div>
             {/* Quality indicator */}
             {quality > 0 && quality < 40 && (
-              <div className="absolute left-4 top-4 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
+              <div className="absolute left-4 top-4 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg">
                 {getUiText(language, "Low quality — hold steady")}
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-4 bg-gradient-to-t from-black/80 to-transparent p-4">
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-4 bg-gradient-to-t from-black/90 to-transparent p-6">
               <button
                 type="button"
                 onClick={capture}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg transition hover:scale-105"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-xl transition hover:scale-105"
               >
-                <div className="h-12 w-12 rounded-full border-4 border-bharatlink-tealDark" />
+                <div className="h-12 w-12 rounded-full border-4 border-orange-600 bg-orange-500" />
               </button>
               <button
                 type="button"
                 onClick={() => { stopCamera(); setState("list"); }}
-                className="rounded-full bg-white/20 px-4 py-2 text-sm font-medium text-white backdrop-blur hover:bg-white/30"
+                className="rounded-full bg-white/20 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur hover:bg-white/30 transition"
               >
                 {getUiText(language, "Cancel")}
               </button>
@@ -303,14 +303,14 @@ export default function DocumentsPage() {
             <img
               src={capturedImage}
               alt={t("documents.capturedDocument")}
-              className="w-full rounded-2xl border border-bharatlink-sand"
+              className="w-full rounded-2xl border border-orange-500/20 shadow-xl"
             />
             <div className="flex items-center gap-3">
               <div className="flex-1">
-                <p className="text-sm font-medium text-bharatlink-navy">
+                <p className="text-sm font-semibold text-bharatlink-navy">
                   {getUiText(language, "Quality:")} {quality}%
                 </p>
-                <div className="mt-1 h-2 overflow-hidden rounded-full bg-bharatlink-sand">
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
                   <div
                     className={`h-full rounded-full transition-all ${
                       quality >= 70 ? "bg-green-500" : quality >= 40 ? "bg-amber-500" : "bg-red-500"
@@ -333,14 +333,14 @@ export default function DocumentsPage() {
               <button
                 type="button"
                 onClick={() => void saveAndReturn()}
-                className="flex-1 rounded-full bg-bharatlink-tealDark py-3 text-sm font-semibold text-white shadow-md transition hover:bg-bharatlink-navy"
+                className="glow-coral flex-1 rounded-full bg-gradient-to-r from-orange-600 to-amber-600 py-3 text-sm font-bold text-white shadow-lg shadow-orange-500/25 transition hover:from-orange-500 hover:to-amber-500"
               >
                 {getUiText(language, "Save to vault")}
               </button>
               <button
                 type="button"
                 onClick={() => { setCapturedImage(""); void startCamera(); }}
-                className="rounded-full border border-bharatlink-sand px-5 py-3 text-sm font-medium text-bharatlink-navy hover:bg-white"
+                className="rounded-full border border-orange-500/30 glass-card px-5 py-3 text-sm font-semibold text-bharatlink-navy hover:border-orange-500/60 transition"
               >
                 {getUiText(language, "Retake")}
               </button>
@@ -350,8 +350,8 @@ export default function DocumentsPage() {
 
         {state === "processing" && (
           <div className="mt-12 flex flex-col items-center gap-4">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-bharatlink-tealDark border-t-transparent" />
-            <p className="text-sm text-bharatlink-navy/60">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent shadow-[0_0_12px_#ea580c]" />
+            <p className="text-sm font-medium text-bharatlink-navy/70">
               {getUiText(language, "Encrypting & saving…")}
             </p>
           </div>
