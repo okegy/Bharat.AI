@@ -25,7 +25,7 @@ const STEP_ICONS = [
 function StepIcon({ name }: { name: (typeof STEP_ICONS)[number] }) {
   const stroke = "currentColor";
   const common = {
-    className: "h-8 w-8 text-bharatlink-tealDark",
+    className: "h-8 w-8 text-orange-600",
     fill: "none",
     viewBox: "0 0 24 24",
     strokeWidth: 1.5,
@@ -159,14 +159,14 @@ export default function Home() {
 
           <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
             <div className="relative z-10">
-              <p className="mb-4 inline-flex items-center rounded-full border border-bharatlink-tealDark/20 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-bharatlink-tealDark backdrop-blur">
+              <p className="mb-4 inline-flex items-center rounded-full border border-orange-500/25 bg-orange-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-600 backdrop-blur">
                 {t("home.badge")}
               </p>
               <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-bharatlink-navy sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
                 <Trans
                   i18nKey="home.heroTitle"
                   components={{
-                    1: <span className="text-bharatlink-tealDark" />,
+                    1: <span className="text-orange-600 font-bold" />,
                   }}
                 />
               </h1>
@@ -183,7 +183,7 @@ export default function Home() {
 
             <div className="relative z-10 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-md animate-float">
-                <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-bharatlink-tealLight/50 to-bharatlink-terracotta/20 blur-xl" />
+                <div className="absolute inset-0 rounded-[2rem] bg-gradient-to-br from-orange-500/20 to-teal-500/10 blur-xl" />
                 <div className="relative overflow-hidden rounded-[2rem] glass-panel p-8 shadow-2xl shadow-bharatlink-navy/10">
                   <div className="mb-6 flex items-center gap-2">
                     <span className="h-2 w-2 rounded-full bg-red-400" />
@@ -195,7 +195,7 @@ export default function Home() {
                   </div>
                   <div className="space-y-3 rounded-2xl glass-card p-4">
                     <div className="h-2 w-3/4 rounded bg-bharatlink-sand" />
-                    <div className="h-2 w-full rounded bg-bharatlink-tealLight/60" />
+                    <div className="h-2 w-full rounded bg-orange-500/30" />
                     <div className="h-2 w-5/6 rounded bg-bharatlink-sand" />
                     <div className="h-2 w-2/3 rounded bg-bharatlink-sand" />
                   </div>
@@ -203,7 +203,7 @@ export default function Home() {
                     {[10, 18, 7, 22, 12, 24, 9, 20, 8, 23, 14].map((h, i) => (
                       <span
                         key={i}
-                        className="w-1.5 rounded-full bg-bharatlink-tealDark/70 animate-pulsebar"
+                        className="w-1.5 rounded-full bg-orange-500 animate-pulsebar"
                         style={{
                           height: `${h}px`,
                           animationDelay: `${i * 0.08}s`,
@@ -267,7 +267,7 @@ export default function Home() {
                       <StepIcon name={icon} />
                     </div>
                     <div className="pt-0.5 sm:pt-1">
-                      <p className="text-xs font-bold uppercase tracking-widest text-bharatlink-tealDark/80">
+                      <p className="text-xs font-bold uppercase tracking-widest text-orange-600">
                         {t("home.step", { num: n })}
                       </p>
                       <h3 className="mt-1 font-display text-xl font-semibold text-bharatlink-navy">
@@ -298,7 +298,7 @@ export default function Home() {
               ).map((key) => (
                 <li
                   key={key}
-                  className="rounded-2xl glass-dark px-5 py-4 text-lg leading-snug text-bharatlink-tealLight/95"
+                  className="rounded-2xl glass-dark px-5 py-4 text-lg leading-snug text-orange-200/95"
                 >
                   {t(`home.${key}`)}
                 </li>
