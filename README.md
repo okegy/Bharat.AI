@@ -135,8 +135,8 @@ The model calls these autonomously in any order, any combination, multiple times
 ### Setup
 
 ```bash
-git clone https://github.com/okegy/Bharat-AI.git
-cd Bharat-AI
+git clone https://github.com/okegy/Bharat.AI.git
+cd Bharat.AI
 npm install
 ```
 

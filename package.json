@@ -2,10 +2,10 @@
   "name": "bharatlink",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/okegy/Bharat-AI",
+  "homepage": "https://github.com/okegy/Bharat.AI",
   "repository": {
     "type": "git",
-    "url": "https://github.com/okegy/Bharat-AI.git"
+    "url": "https://github.com/okegy/Bharat.AI.git"
   },
   "scripts": {
     "dev": "next dev",
