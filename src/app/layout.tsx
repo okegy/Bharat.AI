@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ClearVaultUnlockOnSignOut } from "@/components/BharatLink/ClearVaultUnlockOnSignOut";
 import { CustomCursor } from "@/components/BharatLink/CustomCursor";
+import { GlobalVoiceNavigator } from "@/components/BharatLink/GlobalVoiceNavigator";
+import { PwaRegistry } from "@/components/BharatLink/PwaRegistry";
 import { LanguageProvider } from "@/lib/app-language";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Outfit, Inter } from "next/font/google";
@@ -31,6 +33,8 @@ export const metadata: Metadata = {
     description: "Connecting every voice, every language, to the care and services they need.",
     type: "website",
   },
+  manifest: "/manifest.json",
+  themeColor: "#ea580c",
 };
 
 export default function RootLayout({
@@ -49,9 +53,11 @@ export default function RootLayout({
       <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
         <body className="min-h-screen font-sans bg-ambient-mesh">
           <LanguageProvider>
+            <PwaRegistry />
             <CustomCursor />
             <ClearVaultUnlockOnSignOut />
             {children}
+            <GlobalVoiceNavigator />
           </LanguageProvider>
         </body>
       </html>

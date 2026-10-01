@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
           let filled = 0;
           const filledNames: string[] = [];
           const emptyNames: string[] = [];
+          const filledValues: Record<string, string> = {};
 
           // Track all form field names
           const allFieldNames = acroFields.map((f) => f.getName());
@@ -103,8 +104,23 @@ export async function POST(request: NextRequest) {
               field.setText(value);
               filled++;
               filledNames.push(fieldName);
+              filledValues[fieldName] = value;
             } catch {
               // Field might not exist or not be a text field
+            }
+          }
+
+          // Self-verification — read back what was actually written into the
+          // PDF and compare against the intended values (act -> check -> report).
+          let verifiedCount = 0;
+          const mismatches: { field: string; expected: string; actual: string }[] = [];
+          for (const [fieldName, expected] of Object.entries(filledValues)) {
+            try {
+              const actual = formObj.getTextField(fieldName).getText() ?? "";
+              if (actual === expected) verifiedCount++;
+              else mismatches.push({ field: fieldName, expected, actual });
+            } catch {
+              mismatches.push({ field: fieldName, expected, actual: "<unreadable>" });
             }
           }
 
@@ -128,6 +144,11 @@ export async function POST(request: NextRequest) {
             totalFields: allFieldNames.length,
             emptyFields: emptyNames,
             isComplete,
+            verification: {
+              verified: verifiedCount,
+              mismatches,
+              passed: mismatches.length === 0,
+            },
           });
         }
       } catch {

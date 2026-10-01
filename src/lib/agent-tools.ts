@@ -7,6 +7,7 @@
 
 import type { ProfileData } from "@/lib/profile-vault";
 import type { IndianLanguageCode } from "@/lib/indian-languages";
+import type { MissionPlan } from "@/lib/agent-state";
 import {
   findEligibleSchemes,
   getSchemeById,
@@ -38,6 +39,8 @@ export interface ToolContext {
   language: IndianLanguageCode;
   images?: string[];
   apiKey: string;
+  /** Mission plan being executed across turns (mutable via plan tools). */
+  plan?: MissionPlan;
 }
 
 type ToolExecutor = (
@@ -907,6 +910,74 @@ const getApplicationForm: AgentTool = {
   },
 };
 
+// ─── Mission plan tools (multi-step agentic missions) ────
+
+const createPlan: AgentTool = {
+  definition: {
+    type: "function",
+    function: {
+      name: "create_plan",
+      description:
+        "Create a multi-step mission plan for a goal that needs several actions (e.g., 'apply for PM-KISAN': check eligibility, get form, fill it, download, portal steps). Call this BEFORE starting work on any multi-step goal, then execute the first step. Steps must be short, concrete, and in execution order.",
+      parameters: {
+        type: "object",
+        properties: {
+          goal: { type: "string", description: "The user's overall goal in one short sentence" },
+          steps: { type: "array", items: { type: "string" }, description: "3-6 short concrete steps in execution order" },
+        },
+        required: ["goal", "steps"],
+      },
+    },
+  },
+  execute: async (args, ctx) => {
+    const goal = String(args.goal ?? "").trim();
+    const steps = Array.isArray(args.steps) ? args.steps.map((s) => String(s).trim()).filter(Boolean) : [];
+    if (!goal || steps.length === 0) return { error: "goal and at least one step are required" };
+    ctx.plan = {
+      goal,
+      steps: steps.map((label, i) => ({ label, status: i === 0 ? ("active" as const) : ("pending" as const) })),
+    };
+    return { plan: ctx.plan, message: "Mission plan created: " + goal + ". Starting step 1: " + steps[0] };
+  },
+};
+
+const updatePlan: AgentTool = {
+  definition: {
+    type: "function",
+    function: {
+      name: "update_plan",
+      description:
+        "Mark a mission plan step as done after completing its work. Call this EVERY time you finish a step. The next pending step automatically becomes active.",
+      parameters: {
+        type: "object",
+        properties: {
+          step: { type: "integer", description: "1-based step number to update" },
+          status: { type: "string", enum: ["done", "active", "pending"], description: "New status (usually 'done')" },
+          note: { type: "string", description: "Optional one-line result of the step" },
+        },
+        required: ["step", "status"],
+      },
+    },
+  },
+  execute: async (args, ctx) => {
+    if (!ctx.plan) return { error: "No mission plan is active" };
+    const idx = Number(args.step) - 1;
+    const status = String(args.status ?? "done") as "done" | "active" | "pending";
+    const step = ctx.plan.steps[idx];
+    if (!step) return { error: "Step " + args.step + " does not exist" };
+    step.status = status;
+    if (status === "done") {
+      const next = ctx.plan.steps.find((s) => s.status === "pending");
+      if (next) next.status = "active";
+    }
+    const remaining = ctx.plan.steps.filter((s) => s.status !== "done").length;
+    return {
+      plan: ctx.plan,
+      message: "Step " + (idx + 1) + (status === "done" ? " completed" : " marked " + status) + (args.note ? ": " + String(args.note) : "") + ". " + (remaining ? remaining + " step(s) remaining." : "Mission complete!"),
+    };
+  },
+};
+
 const TOOLS: AgentTool[] = [
   getUserProfile,
   updateUserProfile,
@@ -925,6 +996,8 @@ const TOOLS: AgentTool[] = [
   requestScreenShare,
   openPortal,
   requestVoiceInput,
+  createPlan,
+  updatePlan,
 ];
 
 const TOOL_MAP = new Map<string, AgentTool>(

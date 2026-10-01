@@ -38,3 +38,11 @@ yarn-error.log*
 # clerk configuration (can include secrets)
 /.clerk/
 .env*
+
+# local tooling / artifacts
+.skills/
+demo.webm
+test-results/
+.e2e-temp/
+tsconfig.tsbuildinfo
+scripts/patch-*.py

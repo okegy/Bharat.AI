@@ -33,6 +33,55 @@ function pcm16ToWav(pcmData: Buffer, sampleRate: number): Buffer {
   return Buffer.concat([header, pcmData]);
 }
 
+/**
+ * Sarvam Bulbul — native Indic voices (free credits, no OpenRouter balance
+ * gate). Primary voice engine; OpenRouter gpt-audio is the fallback.
+ * Assamese/Urdu have no Bulbul voice — mapped to the closest language.
+ */
+const SARVAM_LANGS = new Set([
+  "en-IN", "hi-IN", "bn-IN", "ta-IN", "te-IN", "mr-IN",
+  "gu-IN", "kn-IN", "ml-IN", "pa-IN", "od-IN",
+]);
+
+async function speakViaSarvam(
+  text: string,
+  languageCode: string,
+): Promise<string[] | null> {
+  const sarvamKey = (process.env.SARVAM_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
+  if (!sarvamKey) return null;
+
+  let target = languageCode;
+  if (target === "as-IN") target = "bn-IN";
+  else if (target === "ur-IN") target = "hi-IN";
+  if (!SARVAM_LANGS.has(target)) target = target.startsWith("en") ? "en-IN" : "hi-IN";
+
+  try {
+    const res = await fetch("https://api.sarvam.ai/text-to-speech", {
+      method: "POST",
+      headers: {
+        "api-subscription-key": sarvamKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: [text],
+        target_language_code: target,
+        speaker: process.env.SARVAM_TTS_VOICE?.trim() || "priya",
+        model: "bulbul:v3",
+        speech_sample_rate: 22050,
+      }),
+    });
+    if (!res.ok) {
+      console.error("[openrouter/tts] sarvam", res.status, (await res.text()).slice(0, 300));
+      return null;
+    }
+    const data = (await res.json()) as { audios?: string[] };
+    return Array.isArray(data.audios) && data.audios.length ? data.audios : null;
+  } catch (err) {
+    console.error("[openrouter/tts] sarvam failed", err);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   const OPENROUTER_API_KEY = getOpenRouterApiKey();
   if (!OPENROUTER_API_KEY) {
@@ -69,6 +118,16 @@ export async function POST(request: NextRequest) {
     `Do NOT add any preamble, commentary, or translation. Just speak the content:\n\n${slice}`;
 
   try {
+    // Sarvam primary — native Indic voices, no balance gate
+    const sarvamAudios = await speakViaSarvam(slice, languageCode);
+    if (sarvamAudios) {
+      return NextResponse.json({
+        audios: sarvamAudios,
+        model: "sarvam/bulbul:v3",
+        format: "wav",
+      });
+    }
+
     const res = await fetch(OPENROUTER_CHAT_URL, {
       method: "POST",
       headers: {

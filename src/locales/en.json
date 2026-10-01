@@ -291,5 +291,26 @@
     "disability-cert": "Disability Certificate",
     "marksheet": "Marksheet / Diploma",
     "other": "Other Document"
+  },
+  "portal": {
+    "liveAssist": "Live assist",
+    "portalOpened": "The official portal opened in a new tab",
+    "copyInstructions": "Copy each field value below into the official portal",
+    "copyAll": "Copy all",
+    "copiedAll": "All values copied!",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "readField": "Read field",
+    "notInProfile": "Not in your profile yet",
+    "missingCount": "fields are still missing",
+    "fieldGuide": "Field guide",
+    "narrateSteps": "Narrate steps",
+    "editInApp": "Edit in app",
+    "readyToApply": "Ready to apply",
+    "readyDesc": "Your details are ready to fill into the official portal.",
+    "openAndFill": "Open and fill",
+    "openedNarration": "The portal is open. I will read out each field — type the values I say.",
+    "fieldNarration": "Now filling",
+    "fieldEmpty": "This field is empty in your profile — skip it or fill it later in the app."
   }
 }

@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
   const payloadBase = {
     model,
     temperature: 0.1,
+    max_tokens: 500,
     messages: [
       { role: "system", content: SYSTEM },
       {

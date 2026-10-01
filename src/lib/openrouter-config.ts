@@ -67,7 +67,7 @@ export function getOpenRouterVisionModel(): string {
 }
 
 /** @see https://openrouter.ai/models (input_modalities: audio) */
-export const DEFAULT_OPENROUTER_STT_MODEL = "openai/gpt-4o-mini-audio-preview";
+export const DEFAULT_OPENROUTER_STT_MODEL = "openai/gpt-audio-mini";
 
 export function getOpenRouterSttModel(): string {
   return process.env.OPENROUTER_STT_MODEL ?? DEFAULT_OPENROUTER_STT_MODEL;

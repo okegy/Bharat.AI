@@ -295,7 +295,7 @@ export function listen(options: ListenOptions = {}): ListenHandle | null {
 
   // 1. Prioritize native Web Speech API (zero-latency, live streaming, regional language support)
   if (getRecognitionClass()) {
-    const handle = listenViaBrowser(options, bcp);
+    const handle = listenViaBrowser(options, bcp, voiceCode);
     if (handle) return handle;
   }
 
@@ -362,7 +362,15 @@ function listenViaOpenRouter(
   };
 
   navigator.mediaDevices
-    .getUserMedia({ audio: { sampleRate: 16000, channelCount: 1 } })
+    .getUserMedia({
+      audio: {
+        sampleRate: 16000,
+        channelCount: 1,
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      }
+    })
     .then((stream) => {
       if (aborted || stopped) {
         stream.getTracks().forEach((t) => t.stop());
@@ -479,6 +487,7 @@ function getRecognitionClass(): SpeechRecognitionConstructor | null {
 function listenViaBrowser(
   options: ListenOptions,
   bcp: string,
+  voiceCode: string,
 ): ListenHandle | null {
   const Cls = getRecognitionClass();
   if (!Cls) {
@@ -493,8 +502,17 @@ function listenViaBrowser(
   recognition.maxAlternatives = 5;
 
   let timeout: ReturnType<typeof setTimeout> | null = null;
+  // Once the browser recognizer fails fatally, the OpenRouter recorder owns
+  // the callbacks; suppress the recognizer's own onend/onresult so onEnd
+  // fires exactly once.
+  let fellBack = false;
+  let active: ListenHandle = {
+    stop: () => recognition.stop(),
+    abort: () => recognition.abort(),
+  };
 
   recognition.onresult = (event: RecognizerResultEvent) => {
+    if (fellBack) return;
     const list = event.results;
     const chunk = list[list.length - 1];
     if (!chunk) return;
@@ -526,8 +544,32 @@ function listenViaBrowser(
   };
 
   recognition.onerror = (event: RecognizerErrorEvent) => {
-    if (event.error === "no-speech" || event.error === "aborted") return;
-    if (event.error === "not-allowed" || event.error === "permission-denied") {
+    const error = event.error;
+    if (error === "aborted") return;
+
+    // Embedded browsers (webviews) expose the SpeechRecognition constructor
+    // but often cannot reach its cloud speech backend — degrade to the
+    // OpenRouter STT path instead of dead-ending with an error.
+    if (
+      error === "network" ||
+      error === "service-not-allowed" ||
+      error === "language-not-supported" ||
+      error === "audio-capture"
+    ) {
+      const fallback = listenViaOpenRouter(options, voiceCode);
+      if (fallback) {
+        if (timeout) clearTimeout(timeout);
+        fellBack = true;
+        active = fallback;
+        return;
+      }
+    }
+
+    if (error === "no-speech") {
+      options.onError?.(i18n.t("voice.noAudioRecorded") as string);
+      return;
+    }
+    if (error === "not-allowed" || error === "permission-denied") {
       options.onError?.(i18n.t("voice.microphoneDenied") as string || "Microphone access is blocked. Please allow mic permissions in your browser.");
       return;
     }
@@ -535,6 +577,7 @@ function listenViaBrowser(
   };
 
   recognition.onend = () => {
+    if (fellBack) return;
     if (timeout) clearTimeout(timeout);
     options.onEnd?.();
   };
@@ -546,7 +589,7 @@ function listenViaBrowser(
   }
 
   return {
-    stop: () => recognition.stop(),
-    abort: () => recognition.abort(),
+    stop: () => active.stop(),
+    abort: () => active.abort(),
   };
 }

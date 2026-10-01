@@ -31,7 +31,13 @@ export function TopBar() {
         </Link>
         <div className="flex items-center gap-3">
           <CursorToggle />
-          <LanguagePickerNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-orange-600 hover:underline">
+          <Link
+          href="/settings"
+          className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-orange-600 hover:underline"
+        >
+          Data Vault
+        </Link>
+        <LanguagePickerNavLink className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-orange-600 hover:underline">
             {getUiText(language, "Language")}
           </LanguagePickerNavLink>
           {showBiometric ? (

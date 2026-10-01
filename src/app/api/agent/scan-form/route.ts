@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model,
         temperature: 0.1,
+        max_tokens: 1200,
         messages: [
           {
             role: "system",

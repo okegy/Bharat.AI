@@ -71,7 +71,19 @@ export interface AgentConversation {
   activeSchemeId?: string;
   activeFormData?: ActiveFormData;
   screenShareActive?: boolean;
+  plan?: MissionPlan;
   createdAt: number;
+}
+
+/** Multi-step mission the agent is executing across turns. */
+export interface MissionStep {
+  label: string;
+  status: "pending" | "active" | "done";
+}
+
+export interface MissionPlan {
+  goal: string;
+  steps: MissionStep[];
 }
 
 export interface AgentChatResponse {

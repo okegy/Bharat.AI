@@ -27,27 +27,6 @@ function WaveformBars({ active, color = "#ea580c" }: { active: boolean; color?: 
 
 type UIState = "idle" | "listening" | "thinking" | "speaking";
 
-/* ─── Status ring around mic button ─── */
-function MicRing({ state }: { state: UIState }) {
-  const colors: Record<UIState, string> = {
-    idle: "rgba(234,88,12,0.15)",
-    listening: "rgba(239,68,68,0.3)",
-    thinking: "rgba(245,158,11,0.25)",
-    speaking: "rgba(234,88,12,0.35)",
-  };
-  return (
-    <span
-      className="absolute inset-0 rounded-full"
-      style={{
-        background: colors[state],
-        animation: state !== "idle" ? "pulsebar 1.2s ease-in-out infinite" : "none",
-        transform: "scale(1.35)",
-        pointerEvents: "none",
-      }}
-    />
-  );
-}
-
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppLanguage } from "@/lib/app-language";
@@ -69,7 +48,9 @@ import {
   type AgentConversation,
   type AgentPhase,
   type AgentChatResponse,
+  type MissionPlan,
 } from "@/lib/agent-state";
+import { VoiceAvatar } from "@/components/BharatLink/VoiceAvatar";
 
 interface UIMessage {
   id: string;
@@ -82,6 +63,63 @@ interface UIMessage {
   showUploadCard?: boolean;
   toolsUsed?: string[];
   timestamp: number;
+}
+
+type AgentTurnResult = AgentChatResponse & {
+  filledFormData?: Record<string, string>;
+  plan?: MissionPlan;
+  model?: string;
+};
+
+/**
+ * Reads the SSE agent stream, surfacing each tool_start/tool_end to
+ * `onAction` live. Resolves with the final `done` payload.
+ */
+async function consumeAgentStream(
+  res: Response,
+  onAction: (a: { type: "start" | "end"; tool: string; text?: string; summary?: string }) => void,
+): Promise<{ result: AgentTurnResult | null; receivedAny: boolean }> {
+  const reader = res.body!.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let result: AgentTurnResult | null = null;
+  let receivedAny = false;
+
+  const handleChunk = (chunk: string) => {
+    // JSON payloads are single-line, so no dotAll flag needed (es2017 target)
+    const m = chunk.match(/^event: ([^\n]+)\ndata: ([^\n]+)$/);
+    if (!m) return;
+    receivedAny = true;
+    const event = m[1].trim();
+    const data = JSON.parse(m[2]) as Record<string, unknown>;
+    if (event === "tool_start") {
+      onAction({ type: "start", tool: String(data.tool), text: String(data.action ?? data.tool) });
+    } else if (event === "tool_end") {
+      onAction({
+        type: "end",
+        tool: String(data.tool),
+        summary: typeof data.summary === "string" ? data.summary : undefined,
+      });
+    } else if (event === "done") {
+      result = data as unknown as AgentTurnResult;
+    } else if (event === "error") {
+      throw new Error(String(data.error ?? "Agent request failed"));
+    }
+  };
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let idx: number;
+    while ((idx = buf.indexOf("\n\n")) >= 0) {
+      const chunk = buf.slice(0, idx);
+      buf = buf.slice(idx + 2);
+      handleChunk(chunk);
+    }
+  }
+  if (!result) throw new Error("Agent stream ended without a result");
+  return { result, receivedAny };
 }
 
 // UIState is declared at the top of the file
@@ -98,6 +136,35 @@ export default function AssistantPage() {
   const [profile, setProfile] = useState<ProfileData>({});
   const [phase, setPhase] = useState<AgentPhase>("greeting");
   const [error, setError] = useState("");
+
+  // Live agentic action lines (streamed tool activity)
+  interface LiveAction { key: string; tool: string; text: string; summary?: string; done: boolean }
+  const [liveActions, setLiveActions] = useState<LiveAction[]>([]);
+  const liveCounter = useRef(0);
+  const pushLiveAction = useCallback(
+    (a: { type: "start" | "end"; tool: string; text?: string; summary?: string }) => {
+      if (a.type === "start") {
+        liveCounter.current += 1;
+        setLiveActions((prev) => [
+          ...prev.slice(-3),
+          { key: `${a.tool}-${liveCounter.current}`, tool: a.tool, text: a.text ?? a.tool, done: false },
+        ]);
+      } else {
+        setLiveActions((prev) =>
+          prev.map((la) =>
+            la.tool === a.tool && !la.done ? { ...la, done: true, summary: a.summary } : la,
+          ),
+        );
+        setTimeout(() => {
+          setLiveActions((prev) => prev.filter((la) => !(la.tool === a.tool && la.done)));
+        }, 2500);
+      }
+    },
+    [],
+  );
+
+  // Multi-step mission plan the agent is executing
+  const [mission, setMission] = useState<MissionPlan | null>(null);
   const [filledFormFields, setFilledFormFields] = useState<Record<string, string> | null>(null);
   const uploadedFormImageRef = useRef<string>("");
 
@@ -193,25 +260,46 @@ export default function AssistantPage() {
       setError("");
 
       try {
-        const res = await fetch("/api/agent/chat", {
+        const payload = {
+          messages: serializeForApi(updated),
+          language,
+          images: images.length ? images : undefined,
+          profileSnapshot: profileRef.current,
+          phase: phaseRef.current,
+          screenShareActive,
+          plan: currentConv.plan,
+        };
+
+        const runJsonFallback = async (): Promise<AgentTurnResult> => {
+          const jres = await fetch("/api/agent/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!jres.ok) {
+            const err = await jres.json().catch(() => ({ error: "Request failed" }));
+            throw new Error(err.error || `HTTP ${jres.status}`);
+          }
+          return jres.json();
+        };
+
+        let data: AgentTurnResult;
+        const res = await fetch("/api/agent/chat/stream", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            messages: serializeForApi(updated),
-            language,
-            images: images.length ? images : undefined,
-            profileSnapshot: profileRef.current,
-            phase: phaseRef.current,
-            screenShareActive,
-          }),
+          body: JSON.stringify(payload),
         });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({ error: "Request failed" }));
-          throw new Error(err.error || `HTTP ${res.status}`);
+        if (res.ok && res.headers.get("content-type")?.includes("text/event-stream")) {
+          const { result, receivedAny } = await consumeAgentStream(res, pushLiveAction);
+          if (!result) {
+            if (receivedAny) throw new Error("Agent stream ended without a result");
+            data = await runJsonFallback();
+          } else {
+            data = result;
+          }
+        } else {
+          data = await runJsonFallback();
         }
-
-        const data = (await res.json()) as AgentChatResponse & { filledFormData?: Record<string, string> };
 
         // Track filled form fields for quick PDF generation
         if (data.filledFormData) {
@@ -227,8 +315,12 @@ export default function AssistantPage() {
           });
         }
 
-        // Update conversation with assistant reply
+        // Update conversation with assistant reply (+ mission plan state)
         const withReply = addAssistantMessage(updated, data.reply);
+        if (data.plan) {
+          withReply.plan = data.plan;
+          setMission(data.plan);
+        }
         setConv(withReply);
         convRef.current = withReply;
 
@@ -280,7 +372,7 @@ export default function AssistantPage() {
         sendingRef.current = false;
       }
     },
-    [language, screenShareActive, addUIMessage],
+    [language, screenShareActive, addUIMessage, pushLiveAction],
   );
 
   // Keep a ref so intervals/callbacks always use latest sendToAgent
@@ -747,17 +839,16 @@ export default function AssistantPage() {
     speaking: "Speaking…",
   }[uiState];
 
-  const micBg = {
-    idle: "linear-gradient(135deg, #ea580c, #f97316)",
-    listening: "linear-gradient(135deg, #dc2626, #ef4444)",
-    thinking: "linear-gradient(135deg, #f59e0b, #d97706)",
-    speaking: "linear-gradient(135deg, #ea580c, #c2410c)",
-  }[uiState];
-
   // ─── Render ───────────────────────────────────────────
 
   return (
     <main className="mx-auto flex h-screen max-w-2xl flex-col bg-ambient-mesh">
+      {/* ── Ambient aurora background (decorative, reduced-motion safe) ── */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div className="ambient-blob absolute -left-24 -top-24 h-80 w-80 rounded-full bg-orange-400/20 blur-3xl" style={{ animation: "auroraDrift 14s ease-in-out infinite" }} />
+        <div className="ambient-blob absolute -right-20 top-1/3 h-72 w-72 rounded-full bg-amber-300/20 blur-3xl" style={{ animation: "auroraDrift 18s ease-in-out 2s infinite" }} />
+        <div className="ambient-blob absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-rose-300/15 blur-3xl" style={{ animation: "auroraDrift 22s ease-in-out 4s infinite" }} />
+      </div>
       {/* ── Gradient Header ── */}
       <header
         className="relative flex items-center gap-3 px-4 py-3 shadow-md glass-dark"
@@ -810,6 +901,26 @@ export default function AssistantPage() {
           </span>
         )}
       </header>
+
+      {/* ── Mission plan (multi-step agentic goal) ── */}
+      {mission && (
+        <div className="glass-card mx-4 mt-3 rounded-2xl border border-orange-500/20 p-4">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-orange-600">Mission in progress</p>
+          <p className="mt-1 text-sm font-semibold text-bharatlink-navy">{mission.goal}</p>
+          <ol className="mt-2 space-y-1.5">
+            {mission.steps.map((s, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm">
+                <span className={s.status === "done" ? "font-bold text-green-600" : s.status === "active" ? "animate-pulse font-bold text-orange-600" : "text-bharatlink-navy/30"}>
+                  {s.status === "done" ? "✓" : s.status === "active" ? "▸" : "○"}
+                </span>
+                <span className={s.status === "done" ? "text-bharatlink-navy/40 line-through" : s.status === "active" ? "font-semibold text-bharatlink-navy" : "text-bharatlink-navy/50"}>
+                  {s.label}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       {/* ── Chat messages ── */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
@@ -1049,18 +1160,17 @@ export default function AssistantPage() {
             <span className="text-[10px] font-medium" style={{ color: "rgba(15,23,42,0.6)" }}>Scan</span>
           </div>
 
-          {/* ── BIG MIC BUTTON ── */}
+          {/* ── BIG MIC BUTTON (voice avatar) ── */}
           <div className="flex flex-col items-center gap-1.5">
-            <div className="relative">
-              <MicRing state={uiState} />
+            <VoiceAvatar state={uiState} size={104}>
               <button
                 type="button"
                 id="mic-button"
                 data-cursor="mic"
                 onClick={toggleMic}
                 disabled={uiState === "thinking" || !isSTTAvailable()}
-                className={`glow-coral relative flex h-[68px] w-[68px] items-center justify-center rounded-full shadow-xl transition-all hover:scale-105 disabled:opacity-40`}
-                style={{ background: micBg }}
+                aria-label={uiState === "listening" ? "Stop listening" : "Start voice input"}
+                className="relative flex h-14 w-14 items-center justify-center rounded-full text-white transition-all hover:scale-105 disabled:opacity-40"
               >
                 {uiState === "listening" ? (
                   <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" /></svg>
@@ -1075,7 +1185,7 @@ export default function AssistantPage() {
                   <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" /></svg>
                 )}
               </button>
-            </div>
+            </VoiceAvatar>
             <span className="text-[10px] font-bold" style={{ color: "#ea580c" }}>
               {uiState === "listening" ? "Tap to stop" : uiState === "speaking" ? "Tap to interrupt" : "Speak"}
             </span>
@@ -1100,6 +1210,22 @@ export default function AssistantPage() {
           {/* Spacer for symmetry */}
           <div className="w-11" />
         </div>
+
+        {/* Live agent actions (streamed tool activity) */}
+        {liveActions.length > 0 && (
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-1 px-4">
+            {liveActions.map((la) => (
+              <div key={la.key} className="flex items-center gap-2 text-xs text-bharatlink-navy/70">
+                {la.done ? (
+                  <span className="font-bold text-green-600">✓</span>
+                ) : (
+                  <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
+                )}
+                <span>{la.summary ?? la.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Text input */}
         <div className="mt-3 flex items-center gap-2">

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { geminiGenerate } from "@/lib/gemini-client";
 import {
   getOpenRouterApiKey,
   getOpenRouterTranslateModel,
@@ -63,6 +64,20 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       const err = await res.text();
       console.error("[openrouter/translate]", res.status, err);
+
+      // Gemini fallback — keeps translations alive through balance gates
+      const geminiText = await geminiGenerate({
+        system: "You are a translation engine. Output ONLY the translation — no commentary, no quotes.",
+        userParts: [{
+          type: "text",
+          text: `Translate the following text from ${body.sourceLanguageCode ?? "the source language"} to ${body.targetLanguageCode}:\n\n${body.input}`,
+        }],
+        temperature: 0.1,
+      });
+      if (geminiText) {
+        return NextResponse.json({ translated: geminiText.trim(), provider: "gemini" });
+      }
+
       return NextResponse.json(
         { error: "Translate failed", detail: err.slice(0, 500) },
         { status: 502 },

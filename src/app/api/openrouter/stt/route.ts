@@ -15,6 +15,60 @@ function formatFromMime(mime: string): string {
   return "wav";
 }
 
+/**
+ * Groq Whisper — primary STT engine (free tier, strong Indic support, no
+ * OpenRouter balance gate). OpenRouter gpt-4o-mini-audio is the fallback.
+ */
+async function transcribeViaGroq(
+  audioBuf: Buffer,
+  mime: string,
+  languageCode: string,
+): Promise<string | null> {
+  const groqKey = (process.env.GROQ_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
+  if (!groqKey) return null;
+
+  const ext = mime.includes("wav")
+    ? "wav"
+    : mime.includes("webm")
+      ? "webm"
+      : mime.includes("mp4") || mime.includes("m4a")
+        ? "m4a"
+        : "wav";
+  const form = new FormData();
+  form.append(
+    "file",
+    new Blob([new Uint8Array(audioBuf)], { type: mime || "audio/wav" }),
+    `audio.${ext}`,
+  );
+  form.append("model", process.env.GROQ_STT_MODEL?.trim() || "whisper-large-v3");
+  if (languageCode) form.append("language", languageCode.split("-")[0] ?? "");
+  if (languageCode.startsWith("en")) {
+    form.append(
+      "prompt",
+      "Indian government services conversation. Schemes: PM-KISAN, PM Awas Yojana, Ayushman Bharat, PM Ujjwala, Sukanya Samriddhi, MUDRA loan, National Scholarship, ration card, Aadhaar.",
+    );
+  }
+  form.append("response_format", "json");
+  form.append("temperature", "0");
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${groqKey}` },
+      body: form,
+    });
+    if (!res.ok) {
+      console.error("[openrouter/stt] groq", res.status, (await res.text()).slice(0, 300));
+      return null;
+    }
+    const data = (await res.json()) as { text?: string };
+    return typeof data.text === "string" ? data.text.trim() : "";
+  } catch (err) {
+    console.error("[openrouter/stt] groq failed", err);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   const OPENROUTER_API_KEY = getOpenRouterApiKey();
   if (!OPENROUTER_API_KEY) {
@@ -33,6 +87,17 @@ export async function POST(request: NextRequest) {
 
   const buf = Buffer.from(await audioFile.arrayBuffer());
   const base64Audio = buf.toString("base64");
+
+  // Groq primary — reliable, free, Indic-strong
+  const groqTranscript = await transcribeViaGroq(buf, audioFile.type || "audio/wav", languageCode);
+  if (groqTranscript !== null) {
+    return NextResponse.json({
+      transcript: groqTranscript.replace(/^["']|["']$/g, "").trim(),
+      language_code: languageCode,
+      model: process.env.GROQ_STT_MODEL?.trim() || "whisper-large-v3",
+      provider: "groq",
+    });
+  }
   const audioFormat = formatFromMime(audioFile.type || "audio/wav");
 
   const model = getOpenRouterSttModel();

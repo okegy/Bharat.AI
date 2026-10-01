@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { saveProfile, type ProfileData } from "@/lib/profile-vault";
+import { getProfile, saveProfile, type ProfileData } from "@/lib/profile-vault";
 import { getFieldLabel, getUiText } from "@/lib/ui-text";
 import { speak, stopSpeaking } from "@/lib/speech-engine";
 
@@ -23,7 +23,9 @@ export default function AadhaarScanPage() {
   const [backExtracted, setBackExtracted] = useState<ProfileData>({});
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const guideRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const [mergeNotice, setMergeNotice] = useState<string | null>(null);
 
   // Single TTS effect — speaks page title on load, then state transitions
   const hasSpoken = useRef(false);
@@ -86,21 +88,39 @@ export default function AadhaarScanPage() {
     if (!ctx) return;
     ctx.drawImage(video, 0, 0);
 
-    const MAX_EDGE = 1600;
-    let { width, height } = canvas;
-    let dataUrl: string;
-    if (width > MAX_EDGE || height > MAX_EDGE) {
-      const scale = MAX_EDGE / Math.max(width, height);
-      width = Math.round(width * scale);
-      height = Math.round(height * scale);
-      const small = document.createElement("canvas");
-      small.width = width;
-      small.height = height;
-      small.getContext("2d")?.drawImage(canvas, 0, 0, width, height);
-      dataUrl = small.toDataURL("image/jpeg", 0.85);
-    } else {
-      dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+    // Crop to the guide frame (plus a small margin) so card text keeps most
+    // of the image budget instead of being a fraction of the full frame.
+    let sx = 0;
+    let sy = 0;
+    let sw = canvas.width;
+    let sh = canvas.height;
+    const videoRect = video.getBoundingClientRect();
+    const guideRect = guideRef.current?.getBoundingClientRect();
+    if (guideRect && videoRect.width > 0 && videoRect.height > 0) {
+      const MARGIN = 1.08;
+      const relW = Math.min(1, (guideRect.width / videoRect.width) * MARGIN);
+      const relH = Math.min(1, (guideRect.height / videoRect.height) * MARGIN);
+      const relX =
+        (guideRect.left - videoRect.left) / videoRect.width +
+        (guideRect.width / videoRect.width - relW) / 2;
+      const relY =
+        (guideRect.top - videoRect.top) / videoRect.height +
+        (guideRect.height / videoRect.height - relH) / 2;
+      sx = Math.round(Math.max(0, relX * canvas.width));
+      sy = Math.round(Math.max(0, relY * canvas.height));
+      sw = Math.round(Math.min(canvas.width - sx, relW * canvas.width));
+      sh = Math.round(Math.min(canvas.height - sy, relH * canvas.height));
     }
+
+    const MAX_EDGE = 1600;
+    const scale = Math.min(1, MAX_EDGE / Math.max(sw, sh));
+    const width = Math.max(1, Math.round(sw * scale));
+    const height = Math.max(1, Math.round(sh * scale));
+    const small = document.createElement("canvas");
+    small.width = width;
+    small.height = height;
+    small.getContext("2d")?.drawImage(canvas, sx, sy, sw, sh, 0, 0, width, height);
+    const dataUrl = small.toDataURL("image/jpeg", 0.9);
 
     stopCamera();
     setState("processing");
@@ -130,15 +150,42 @@ export default function AadhaarScanPage() {
         return;
       }
 
+      const scanned = data.profile ?? {};
+
       if (scanSide === "front") {
-        setExtracted(data.profile ?? {});
+        // Merge policy: manually entered details win; the scan only fills
+        // gaps. A matching Aadhaar number confirms the scan is the same card.
+        let saved: ProfileData = {};
+        try {
+          saved = await getProfile();
+        } catch {
+          saved = {};
+        }
+        const merged: ProfileData = { ...scanned };
+        for (const [key, val] of Object.entries(saved)) {
+          if (typeof val === "string" && val) {
+            merged[key as keyof ProfileData] = val;
+          }
+        }
+        const savedNum = (saved.aadhaarNumber ?? "").replace(/\D/g, "");
+        const scannedNum = (scanned.aadhaarNumber ?? "").replace(/\D/g, "");
+        if (savedNum && scannedNum) {
+          setMergeNotice(
+            savedNum === scannedNum
+              ? "Matched your saved Aadhaar number — details auto-filled from what you entered."
+              : "Scanned Aadhaar number doesn't match your saved details — kept your saved details.",
+          );
+        } else if (Object.keys(saved).length > 0) {
+          setMergeNotice("Auto-filled from your saved details; the scan filled the blanks.");
+        }
+        setExtracted(merged);
         setState("done");
       } else {
-        setBackExtracted(data.profile ?? {});
+        setBackExtracted(scanned);
         // Merge back data into extracted (back overrides only empty fields)
         setExtracted((prev) => {
           const merged = { ...prev };
-          const back = data.profile ?? {};
+          const back = scanned;
           for (const [key, val] of Object.entries(back)) {
             if (val && !merged[key as keyof ProfileData]) {
               merged[key as keyof ProfileData] = val;
@@ -203,6 +250,13 @@ export default function AadhaarScanPage() {
             </svg>
             {getUiText(language, "Open camera")}
           </button>
+          <button
+            type="button"
+            onClick={() => setState("done")}
+            className="inline-flex h-12 items-center justify-center rounded-full border border-orange-500/30 px-6 text-sm font-bold text-orange-600 transition hover:bg-orange-500/10"
+          >
+            {getUiText(language, "Enter details manually")}
+          </button>
           <Link
             href="/onboarding/voice"
             className="text-center text-sm font-medium text-bharatlink-navy/50 underline-offset-4 hover:underline"
@@ -216,7 +270,7 @@ export default function AadhaarScanPage() {
         <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-orange-500/30 bg-black">
           <video ref={videoRef} className="w-full" autoPlay playsInline muted />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div className="h-48 w-72 rounded-xl border-2 border-white/60 shadow-lg sm:h-56 sm:w-80" />
+            <div ref={guideRef} className="h-48 w-72 rounded-xl border-2 border-white/60 shadow-lg sm:h-56 sm:w-80" />
           </div>
           <div className="absolute inset-x-0 bottom-0 flex justify-center gap-4 bg-gradient-to-t from-black/80 to-transparent p-4">
             <button
@@ -252,6 +306,11 @@ export default function AadhaarScanPage() {
           <p className="text-sm font-bold text-orange-600">
             {getUiText(language, "Fill in or correct the details below, then continue.")}
           </p>
+          {mergeNotice && (
+            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+              {getUiText(language, mergeNotice)}
+            </p>
+          )}
           {(
             [
               { key: "fullName" as const, label: "Full Name" },

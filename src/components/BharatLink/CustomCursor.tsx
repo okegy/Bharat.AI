@@ -12,6 +12,10 @@ export function CustomCursor() {
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [isTouch, setIsTouch] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  // Pointer is over an iframe / embedded widget — hide the custom cursor and
+  // let the native one take over (see setNative in the listener effect).
+  const [overNative, setOverNative] = useState(false);
+  const overNativeRef = useRef(false);
 
   // Position physics state
   const mousePos = useRef({ x: -100, y: -100 });
@@ -105,9 +109,33 @@ export function CustomCursor() {
       setIsMouseDown(false);
     };
 
+    // Delegated (works for dynamically-mounted iframes too): entering an
+    // iframe (Clerk account modal, Google widgets) hides the custom cursor —
+    // cross-origin iframes don't emit parent mousemove, so it would freeze.
+    const setNative = (over: boolean) => {
+      if (overNativeRef.current === over) return;
+      overNativeRef.current = over;
+      setOverNative(over);
+      document.documentElement.classList.toggle("custom-cursor-iframe", over);
+    };
+    const onOver = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "IFRAME" || (typeof t.closest === "function" && t.closest("iframe")))) {
+        setNative(true);
+      } else {
+        setNative(false);
+      }
+    };
+    // Pointer left the browser window entirely (relatedTarget null)
+    const onDocOut = (e: MouseEvent) => {
+      if (!e.relatedTarget) setNative(true);
+    };
+
     window.addEventListener("mousemove", onMouseMove, { passive: true });
     window.addEventListener("mousedown", onMouseDown);
     window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("mouseover", onOver, true);
+    document.addEventListener("mouseout", onDocOut, true);
 
     // Smooth animation loop using lerp (linear interpolation)
     const render = () => {
@@ -138,6 +166,9 @@ export function CustomCursor() {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("mouseover", onOver, true);
+      document.removeEventListener("mouseout", onDocOut, true);
+      document.documentElement.classList.remove("custom-cursor-iframe");
       if (rafId.current) cancelAnimationFrame(rafId.current);
       document.documentElement.classList.remove("custom-cursor-active");
     };
@@ -148,7 +179,11 @@ export function CustomCursor() {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+    <div
+      className={`pointer-events-none fixed inset-0 z-[2147483647] overflow-hidden transition-opacity duration-150 ${
+        overNative ? "opacity-0" : "opacity-100"
+      }`}
+    >
       {/* Outer Easing Ring / Comet Trail */}
       <div
         ref={ringRef}
