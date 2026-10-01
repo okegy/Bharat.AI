@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getProfile, saveProfile, type ProfileData } from "@/lib/profile-vault";
+import { logVaultAccess } from "@/lib/vault-log";
 import { getFieldLabel, getUiText } from "@/lib/ui-text";
 import { speak, stopSpeaking } from "@/lib/speech-engine";
 
@@ -210,6 +211,7 @@ export default function AadhaarScanPage() {
   const saveAndContinue = useCallback(async () => {
     const merged = { ...extracted, ...manualFields };
     await saveProfile(merged);
+    void logVaultAccess({ source: "/onboarding/aadhaar", dataCategory: "profile (Aadhaar scan)", action: "write" });
     router.push("/onboarding/voice");
   }, [extracted, manualFields, router]);
 

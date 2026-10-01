@@ -96,6 +96,29 @@ export default function DashboardPage() {
           </p>
         </section>
 
+        {/* Vault Hub CTA */}
+        <section className="mb-8">
+          <Link
+            href="/dashboard/vault"
+            className="group flex items-center gap-4 rounded-2xl glass-card border border-orange-500/30 p-5 shadow-lg shadow-orange-500/10 hover:border-orange-500/60 transition"
+          >
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-md shadow-orange-500/30 glow-coral">
+              <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75M6.75 21.75h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-base font-bold text-bharatlink-navy group-hover:text-orange-600 transition">Vault Hub — reminders &amp; access log</p>
+              <p className="text-sm text-bharatlink-navy/60">
+                Renewal dates, document access timeline, and every vault entry in one place
+              </p>
+            </div>
+            <svg className="h-5 w-5 text-orange-600 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </Link>
+        </section>
+
         {/* BharatLink Assistant CTA */}
         <section className="mb-8">
           <Link

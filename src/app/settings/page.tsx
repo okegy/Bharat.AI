@@ -13,6 +13,7 @@ import {
   type SchemeReference,
 } from "@/lib/profile-vault";
 import { CursorToggle } from "@/components/BharatLink/CursorToggle";
+import { logVaultAccess } from "@/lib/vault-log";
 
 /** Circular progress ring — SVG, gradient stroke, animated. */
 function DataRing({
@@ -104,6 +105,7 @@ export default function SettingsPage() {
   useEffect(() => {
     let alive = true;
     (async () => {
+      void logVaultAccess({ source: "/settings", dataCategory: "profile, documents, family, references", action: "read" });
       const [p, d, f, r] = await Promise.all([
         getProfile().catch(() => ({}) as ProfileData),
         getDocuments().catch(() => [] as CapturedDocument[]),

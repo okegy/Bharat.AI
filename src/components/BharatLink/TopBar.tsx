@@ -2,6 +2,7 @@
 
 import { BiometricSetupNavLink } from "@/components/BharatLink/BiometricSetupNavLink";
 import { CursorToggle } from "@/components/BharatLink/CursorToggle";
+import { VaultBell } from "@/components/BharatLink/VaultBell";
 import { LanguagePickerNavLink } from "@/components/BharatLink/LanguagePickerNavLink";
 import { useAppLanguage } from "@/lib/app-language";
 import { isWebAuthnAvailable } from "@/lib/biometric-storage";
@@ -31,7 +32,8 @@ export function TopBar() {
         </Link>
         <div className="flex items-center gap-3">
           <CursorToggle />
-          <Link
+          <VaultBell />
+        <Link
           href="/settings"
           className="text-sm font-semibold text-bharatlink-navy/80 underline-offset-4 transition hover:text-orange-600 hover:underline"
         >

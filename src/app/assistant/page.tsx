@@ -38,6 +38,7 @@ import {
   type ListenHandle,
 } from "@/lib/speech-engine";
 import { getProfile, saveProfile, type ProfileData } from "@/lib/profile-vault";
+import { logVaultAccess } from "@/lib/vault-log";
 import { useTranslation } from "react-i18next";
 import {
   createConversation,
@@ -205,6 +206,8 @@ export default function AssistantPage() {
     if (hasInitialized.current) return;
     hasInitialized.current = true;
     getProfile().then((p) => {
+      void logVaultAccess({ source: "/assistant", dataCategory: "profile", action: "read" });
+      void logVaultAccess({ source: "/assistant", dataCategory: "profile", action: "read" });
       setProfile(p);
       const c = createConversation(language);
       setConv(c);

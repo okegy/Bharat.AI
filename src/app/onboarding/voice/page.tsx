@@ -13,6 +13,7 @@ import {
   type ListenHandle,
 } from "@/lib/speech-engine";
 import { getProfile, saveProfile, type ProfileData } from "@/lib/profile-vault";
+import { logVaultAccess } from "@/lib/vault-log";
 import {
   getOnboardingQuestionText,
   type VoiceOnboardingQuestionId,
@@ -124,6 +125,7 @@ export default function VoiceOnboardingPage() {
       } else {
         setSaving(true);
         const final = { ...answers, [currentQ]: stored };
+        void logVaultAccess({ source: "/onboarding/voice", dataCategory: "profile (voice answers)", action: "write" });
         saveProfile(final).then(() => {
           markOnboardingComplete();
           router.push("/assistant");
