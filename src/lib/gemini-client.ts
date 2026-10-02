@@ -9,6 +9,17 @@ export function getGeminiApiKey(): string {
   return (process.env.GEMINI_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
 }
 
+/** GEMINI_API_KEY, GEMINI_API_KEY_2 … _4 — each key is its own daily quota. */
+export function getGeminiApiKeys(): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const name = i === 0 ? "GEMINI_API_KEY" : `GEMINI_API_KEY_${i}`;
+    const v = (process.env[name] ?? "").trim().replace(/^["']|["']$/g, "");
+    if (v) out.push(v);
+  }
+  return out.length ? out : [""];
+}
+
 export type GeminiInputPart =
   | { type: "text"; text: string }
   | { type: "image"; dataUrl: string }
@@ -70,7 +81,9 @@ export async function geminiGenerate(opts: {
     body.systemInstruction = { parts: [{ text: opts.system }] };
   }
 
+  const apiKeys = getGeminiApiKeys().filter(Boolean);
   for (const model of models) {
+   for (const apiKey of apiKeys) {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         if (attempt > 0) {
@@ -78,7 +91,7 @@ export async function geminiGenerate(opts: {
           await new Promise((r) => setTimeout(r, 2500));
         }
         const res = await fetch(
-          `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
+          `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -108,6 +121,7 @@ export async function geminiGenerate(opts: {
         break;
       }
     }
+   }
   }
   return null;
 }

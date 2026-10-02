@@ -28,6 +28,17 @@ import {
 } from "@/lib/openai-loop";
 
 const GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
+
+/** GROQ_API_KEY, GROQ_API_KEY_2 … _9 — every key is its own free rate pool. */
+function getGroqKeys(): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const name = i === 0 ? "GROQ_API_KEY" : `GROQ_API_KEY_${i}`;
+    const v = (process.env[name] ?? "").trim().replace(/^["']|["']$/g, "");
+    if (v) out.push(v);
+  }
+  return out;
+}
 const GROQ_MODEL = process.env.GROQ_AGENT_MODEL?.trim() || "openai/gpt-oss-120b";
 
 /** After OpenRouter refuses, stop trying it for 5 minutes. */
@@ -130,7 +141,7 @@ If there ARE missing fields, ask for them FIRST, then generate the PDF once the 
 ${plan.steps.map((s, i) => `${i + 1}. [${s.status.toUpperCase()}] ${s.label}`).join("\n")}
 
 Work ONLY on the ACTIVE step right now, using tools. The moment a step's work is finished, call update_plan with that step number and status "done" — the next step becomes active automatically. Then immediately start working on it.
-Keep replies short and focused on the current step. NEVER call create_plan again for this mission. When ALL steps are done, congratulate the user and summarize what was accomplished.`
+Keep replies short and focused on the current step. NEVER call create_plan again for this mission. If the user asks something unrelated to the mission, answer it helpfully first (tools are allowed), then steer back to the active step. When ALL steps are done, congratulate the user and summarize what was accomplished.`
     : "\n\nWhen the user states a goal that needs several actions (e.g., 'apply for PM-KISAN', 'scan my form then fill it', or anything needing 2+ phases of work), FIRST call create_plan with a one-line goal and 3-6 short concrete steps, THEN immediately start executing step 1 with tools.";
 
   return `You are BharatLink, a kind and patient voice assistant helping Indian citizens access government schemes and fill forms. You communicate in ${langLabel}.
@@ -289,7 +300,9 @@ export async function runAgentTurn(
     const groq = await runOpenAILoop({
       baseUrl: GROQ_CHAT_URL,
       apiKey: groqKey,
+      apiKeys: getGroqKeys(),
       model: GROQ_MODEL,
+      altModels: ["openai/gpt-oss-20b", "qwen/qwen3.8-27b"],
       system: systemPrompt,
       messages: loopMessages,
       tools,

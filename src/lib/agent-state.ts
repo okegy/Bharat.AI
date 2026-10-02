@@ -141,7 +141,7 @@ export function addAssistantMessage(
  *  Avoids cutting mid-tool-call sequence (orphaned tool results). */
 export function trimConversation(
   conv: AgentConversation,
-  maxMessages = 40,
+  maxMessages = 14,
 ): AgentConversation {
   if (conv.messages.length <= maxMessages) return conv;
   let cutIndex = conv.messages.length - maxMessages;

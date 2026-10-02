@@ -1,6 +1,11 @@
 /**
- * OpenAI-compatible agentic loop — shared by OpenRouter and Groq brains.
- * Runs the full tool-calling turn: model → tool_calls → executeTool → repeat.
+ * OpenAI-compatible agentic loop — shared by OpenRouter, Groq, and Ollama
+ * brains. Runs the full tool-calling turn: model → tool_calls → executeTool
+ * → repeat.
+ *
+ * Multi-key support: pass `apiKeys` and every key is tried against the model
+ * chain — each key has its own rate pool, so keys from separate accounts
+ * stack capacity instead of just adding redundancy.
  */
 
 import { executeTool, type ToolContext } from "@/lib/agent-tools";
@@ -33,7 +38,11 @@ export type AgentEmitter = (e: { event: string; data: unknown }) => void;
 export interface OpenAILoopParams {
   baseUrl: string;
   apiKey: string;
+  /** Additional keys — tried in order when earlier ones are rate-limited. */
+  apiKeys?: string[];
   model: string;
+  /** Extra models to try when the primary is rate-limited (429/TPM). */
+  altModels?: string[];
   system: string;
   messages: LoopMessage[];
   tools: OpenAITool[];
@@ -55,6 +64,19 @@ export interface OpenAILoopResult {
   model: string;
 }
 
+interface ChatChoice {
+  choices?: Array<{
+    message?: {
+      content?: string | null;
+      tool_calls?: Array<{
+        id: string;
+        type: string;
+        function: { name: string; arguments: string };
+      }>;
+    };
+  }>;
+}
+
 export async function runOpenAILoop(opts: OpenAILoopParams): Promise<OpenAILoopResult | null> {
   const messages: LoopMessage[] = [
     { role: "system", content: opts.system },
@@ -66,72 +88,74 @@ export async function runOpenAILoop(opts: OpenAILoopParams): Promise<OpenAILoopR
   let nextAction: unknown;
   const maxTokens = opts.maxTokens ?? 1500;
 
-  for (let i = 0; i < 10; i++) {
-    let res: Response;
-    try {
-      res = await fetch(opts.baseUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${opts.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: opts.model,
-          messages,
-          tools: opts.tools,
-          tool_choice: "auto",
-          temperature: 0.4,
-          max_tokens: maxTokens,
-        }),
-      });
-    } catch (err) {
-      console.error("[openai-loop]", opts.model, "fetch failed", err);
-      return null;
+  const keys = [...new Set([opts.apiKey, ...(opts.apiKeys ?? [])])].filter(Boolean);
+  const modelChain = [...new Set([opts.model, ...(opts.altModels ?? [])])];
+  // Keys × models cross-product: every combination is a separate rate pool.
+  const attempts: Array<{ key: string; model: string }> = [];
+  for (const key of keys) {
+    for (const model of modelChain) {
+      attempts.push({ key, model });
     }
+  }
+  let servedModel = opts.model;
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("[openai-loop]", opts.model, res.status, errText.slice(0, 200));
-      // One fast retry on transient throttling/errors
-      if (res.status === 429 || res.status >= 500) {
-        await new Promise((r) => setTimeout(r, 1200));
-        try {
-          res = await fetch(opts.baseUrl, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${opts.apiKey}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: opts.model,
-              messages,
-              tools: opts.tools,
-              tool_choice: "auto",
-              temperature: 0.4,
-              max_tokens: maxTokens,
-            }),
-          });
-        } catch {
-          return null;
-        }
-        if (!res.ok) return null;
-      } else {
-        return null;
+  async function chatAttempt(model: string, key: string): Promise<Response> {
+    return fetch(opts.baseUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        tools: opts.tools,
+        tool_choice: "auto",
+        temperature: 0.4,
+        max_tokens: maxTokens,
+      }),
+    });
+  }
+
+  async function tryOnce(): Promise<ChatChoice | null> {
+    for (const { key, model } of attempts) {
+      let res: Response;
+      try {
+        res = await chatAttempt(model, key);
+      } catch (err) {
+        console.error("[openai-loop]", model, "fetch failed", err);
+        continue;
       }
-    }
 
-    const data = (await res.json()) as {
-      choices?: Array<{
-        message?: {
-          content?: string | null;
-          tool_calls?: Array<{
-            id: string;
-            type: string;
-            function: { name: string; arguments: string };
-          }>;
-        };
-      }>;
-    };
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error("[openai-loop]", model, res.status, errText.slice(0, 200));
+        if (res.status === 429 || res.status >= 500) {
+          // One fast retry, then move to the next pool (key or model)
+          await new Promise((r) => setTimeout(r, 1200));
+          try {
+            res = await chatAttempt(model, key);
+          } catch {
+            continue;
+          }
+          if (!res.ok) continue;
+        } else {
+          // 400/401/403 — configuration issue, but a DIFFERENT key may still
+          // work, so keep trying the remaining combinations.
+          continue;
+        }
+      }
+
+      servedModel = model;
+      return (await res.json()) as ChatChoice;
+    }
+    return null;
+  }
+
+  for (let i = 0; i < 10; i++) {
+    const data = await tryOnce();
+    if (!data) return null;
+
     const assistantMsg = data.choices?.[0]?.message;
     if (!assistantMsg) return null;
 
@@ -214,7 +238,7 @@ export async function runOpenAILoop(opts: OpenAILoopParams): Promise<OpenAILoopR
       nextAction: nextAction ?? { type: "none" },
       toolsUsed: [...new Set(toolsUsed)],
       plan: opts.toolCtx.plan,
-      model: opts.model,
+      model: servedModel,
     };
   }
 
@@ -224,6 +248,6 @@ export async function runOpenAILoop(opts: OpenAILoopParams): Promise<OpenAILoopR
     nextAction: nextAction ?? { type: "none" },
     toolsUsed: [...new Set(toolsUsed)],
     plan: opts.toolCtx.plan,
-    model: opts.model,
+    model: servedModel,
   };
 }
