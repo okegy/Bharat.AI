@@ -332,6 +332,45 @@ export async function runAgentTurn(
     console.error("[agent-run] gemini agentic loop failed", geminiErr);
   }
 
+  // ── 3.5. Local Ollama (offline resilience — auto-detects a tools-capable model) ──
+  const ollamaUrl = process.env.OLLAMA_URL?.trim() || "http://localhost:11434";
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2000);
+    const tagsRes = await fetch(ollamaUrl + "/api/tags", { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (tagsRes.ok) {
+      const tags = (await tagsRes.json()) as {
+        models?: Array<{ name: string; capabilities?: string[] }>;
+      };
+      const toolModel =
+        (process.env.OLLAMA_MODEL?.trim() || undefined) ??
+        tags.models?.find((m) => m.capabilities?.includes("tools"))?.name;
+      if (toolModel) {
+        const ollama = await runOpenAILoop({
+          baseUrl: ollamaUrl + "/v1",
+          apiKey: "ollama",
+          model: toolModel,
+          system: systemPrompt,
+          messages: loopMessages,
+          tools,
+          toolCtx,
+          profileSnapshot: input.profileSnapshot,
+          emit: emitBridge,
+          actionLabel: (t) => TOOL_ACTION_LABELS[t] ?? "Working",
+          describe: describeToolResult,
+          maxTokens: 1200,
+        }).catch(() => null);
+
+        if (ollama && ollama.reply) {
+          return { ...ollama, plan: ollama.plan ?? toolCtx.plan };
+        }
+      }
+    }
+  } catch {
+    /* Ollama not running or too slow — silently continue */
+  }
+
   // ── 4. Gemini text-only reply (no tools) ──
   const geminiReply = await geminiGenerate({
     system: systemPrompt,
