@@ -384,6 +384,29 @@ export async function runAgentTurn(
     /* Ollama not running or too slow — silently continue */
   }
 
+  // ── 3.5. NVIDIA NIM (kimi-k3) — separate free credit pool ──
+  const nvidiaKey = (process.env.NVIDIA_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
+  if (nvidiaKey) {
+    const nim = await runOpenAILoop({
+      baseUrl: "https://integrate.api.nvidia.com/v1/chat/completions",
+      apiKey: nvidiaKey,
+      model: process.env.NVIDIA_AGENT_MODEL?.trim() || "moonshotai/kimi-k3",
+      system: systemPrompt,
+      messages: loopMessages,
+      tools,
+      toolCtx,
+      profileSnapshot: input.profileSnapshot,
+      emit: emitBridge,
+      actionLabel: (t) => TOOL_ACTION_LABELS[t] ?? "Working",
+      describe: describeToolResult,
+      maxTokens: 1500,
+    }).catch(() => null);
+
+    if (nim && nim.reply) {
+      return { ...nim, plan: nim.plan ?? toolCtx.plan };
+    }
+  }
+
   // ── 4. Gemini text-only reply (no tools) ──
   const geminiReply = await geminiGenerate({
     system: systemPrompt,
