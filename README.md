@@ -85,6 +85,26 @@ All personal data is **AES-GCM encrypted** and stored only in your browser's Ind
 
 ---
 
+## 💬 WhatsApp in Action
+
+A real conversation with the live bot — user asks in plain language, the agent replies with schemes matched to their profile, formatted for WhatsApp:
+
+| Conversation | Full reply |
+|:---:|:---:|
+| ![WhatsApp conversation 1](docs/screenshots/06-whatsapp-1.jpeg) | ![WhatsApp conversation 2](docs/screenshots/06-whatsapp-2.jpeg) |
+
+**Transcript:**
+
+> **User:** Hi
+>
+> **BharatLink:** Hii, how can I help you to see your available schemes?
+>
+> **User:** I want available schemes as per my eligibility
+>
+> **BharatLink:** 1. **Ayushman Bharat (PM-JAY)** — health insurance cover of ₹5 lakh per family. 2. **PM Awas Yojana (Urban)** — interest subsidy up to ₹2.67 lakh for home loans. 3. **PM Surya Ghar** — rooftop solar subsidy up to ₹78,000 and free electricity. 4. **Mission Vatsalya** — ₹4,000 per month for vulnerable children. 5. **ADIP Scheme for Divyangjan** — free assistive devices and services. 6. **DAY-NULM (Urban Livelihoods)** — skill training and micro-enterprise loans. 7. **PM Jan Dhan Yojana** — zero-balance bank account with insurance cover.
+>
+> *Which of these would you like more details about, or would you like help applying for any of them?*
+
 ## WhatsApp Chatbot Setup
 
 BharatLink's agent also answers on WhatsApp (text + voice notes). The webhook is live at:
