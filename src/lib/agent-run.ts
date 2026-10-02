@@ -1,26 +1,37 @@
 /**
- * BharatLink agent core — one conversation turn of the server-side agentic
- * loop. Shared by the JSON route (/api/agent/chat) and the SSE stream route
- * (/api/agent/chat/stream); `emit` receives live tool events when streaming.
+ * BharatLink agent orchestrator — one conversation turn.
+ *
+ * Brain chain (first success wins, every failure degrades gracefully):
+ *   1. OpenRouter (gpt-4o-mini)       — premium path, used when balance > 0
+ *   2. Groq (llama-3.3-70b-versatile) — free, fast, fresh quota pool
+ *   3. Gemini (native function-calling loop, gemini-agent.ts)
+ *   4. Gemini text-only reply
+ *   5. Graceful spoken message — raw provider errors never reach the user
  */
 
 import type { ProfileData } from "@/lib/profile-vault";
 import type { IndianLanguageCode } from "@/lib/indian-languages";
-import type { AgentPhase, ChatMessage, MissionPlan } from "@/lib/agent-state";
-import {
-  getToolDefinitions,
-  executeTool,
-  type ToolContext,
-} from "@/lib/agent-tools";
+import type { AgentPhase, MissionPlan } from "@/lib/agent-state";
+import { getToolDefinitions } from "@/lib/agent-tools";
 import {
   getOpenRouterAgentModel,
+  getOpenRouterApiKey,
   getVoiceLangLabel,
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
 import { geminiGenerate } from "@/lib/gemini-client";
 import { runGeminiAgentTurn } from "@/lib/gemini-agent";
+import {
+  runOpenAILoop,
+  type AgentEmitter,
+  type LoopMessage,
+} from "@/lib/openai-loop";
 
-const MAX_TOOL_ITERATIONS = 10;
+const GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = process.env.GROQ_AGENT_MODEL?.trim() || "openai/gpt-oss-120b";
+
+/** After OpenRouter refuses, stop trying it for 5 minutes. */
+let openrouterCooldownUntil = 0;
 
 export interface AgentChatMessage {
   role: string;
@@ -114,7 +125,6 @@ If there ARE missing fields, ask for them FIRST, then generate the PDF once the 
     ? "\nScreen sharing is ACTIVE. You will receive periodic screenshots. Analyze them and guide the user."
     : "";
 
-  // Mission mode — the agent works through a persistent multi-step plan.
   const missionNote = plan
     ? `\n\nMISSION IN PROGRESS — ${plan.goal}
 ${plan.steps.map((s, i) => `${i + 1}. [${s.status.toUpperCase()}] ${s.label}`).join("\n")}
@@ -207,6 +217,16 @@ function describeToolResult(name: string, result: unknown): string | undefined {
   }
 }
 
+function toLoopMessages(messages: AgentChatMessage[]): LoopMessage[] {
+  return messages.map((m) => ({
+    role: m.role,
+    content: m.content,
+    tool_calls: m.tool_calls,
+    tool_call_id: m.tool_call_id,
+    name: m.name,
+  }));
+}
+
 export async function runAgentTurn(
   input: AgentRunInput,
   emit?: (event: AgentEvent) => void,
@@ -220,7 +240,7 @@ export async function runAgentTurn(
     input.plan,
   );
 
-  const toolCtx: ToolContext = {
+  const toolCtx = {
     profile: input.profileSnapshot,
     language: input.language,
     // OpenAI rejects non-image MIME types ("Invalid MIME type") and 502s the
@@ -229,275 +249,123 @@ export async function runAgentTurn(
       (img) => typeof img === "string" && img.startsWith("data:image/"),
     ),
     apiKey: OPENROUTER_API_KEY,
-    plan: input.plan ? { goal: input.plan.goal, steps: input.plan.steps.map((s) => ({ ...s })) } : undefined,
+    plan: input.plan
+      ? { goal: input.plan.goal, steps: input.plan.steps.map((s) => ({ ...s })) }
+      : undefined,
   };
 
-  const messages: AgentChatMessage[] = [
-    { role: "system", content: systemPrompt },
-    ...input.messages,
-  ];
-
-  const model = getOpenRouterAgentModel();
   const tools = getToolDefinitions();
-  let profileUpdates: Record<string, string> | undefined;
-  let filledFormData: Record<string, string> | undefined;
-  const toolsUsed: string[] = [];
-  let nextAction: unknown;
+  const loopMessages = toLoopMessages(input.messages);
 
+  const emitBridge: AgentEmitter | undefined = emit
+    ? (e) => emit({ event: e.event, data: e.data } as AgentEvent)
+    : undefined;
+
+  // ── 1. OpenRouter (premium path, skipped while on cooldown) ──
+  if (Date.now() >= openrouterCooldownUntil) {
+    const openrouter = await runOpenAILoop({
+      baseUrl: OPENROUTER_CHAT_URL,
+      apiKey: OPENROUTER_API_KEY,
+      model: getOpenRouterAgentModel(),
+      system: systemPrompt,
+      messages: loopMessages,
+      tools,
+      toolCtx,
+      profileSnapshot: input.profileSnapshot,
+      emit: emitBridge,
+      actionLabel: (t) => TOOL_ACTION_LABELS[t] ?? "Working",
+      describe: describeToolResult,
+    }).catch(() => null);
+
+    if (openrouter && openrouter.reply) {
+      return { ...openrouter, plan: openrouter.plan ?? toolCtx.plan };
+    }
+    openrouterCooldownUntil = Date.now() + 5 * 60 * 1000;
+  }
+
+  // ── 2. Groq (llama-3.3-70b) — free, fast, fresh quota pool ──
+  const groqKey = (process.env.GROQ_API_KEY ?? "").trim().replace(/^["']|["']$/g, "");
+  if (groqKey) {
+    const groq = await runOpenAILoop({
+      baseUrl: GROQ_CHAT_URL,
+      apiKey: groqKey,
+      model: GROQ_MODEL,
+      system: systemPrompt,
+      messages: loopMessages,
+      tools,
+      toolCtx,
+      profileSnapshot: input.profileSnapshot,
+      emit: emitBridge,
+      actionLabel: (t) => TOOL_ACTION_LABELS[t] ?? "Working",
+      describe: describeToolResult,
+    }).catch(() => null);
+
+    if (groq && groq.reply) {
+      return { ...groq, plan: groq.plan ?? toolCtx.plan };
+    }
+  }
+
+  // ── 3. Gemini agentic loop (native function-calling, free tier) ──
   try {
-    for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-      const res = await fetch(OPENROUTER_CHAT_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-          tools,
-          tool_choice: "auto",
-          temperature: 0.4,
-          // Keep each turn affordable — OpenRouter 402s when the requested
-          // token budget exceeds the remaining balance.
-          max_tokens: 1500,
-        }),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error("[agent-run] OpenRouter error", res.status, model, errText);
-        let errDetail: string;
-        try {
-          const errJson = JSON.parse(errText);
-          errDetail = errJson?.error?.message ?? errJson?.message ?? errText.slice(0, 500);
-        } catch {
-          errDetail = errText.slice(0, 500);
-        }
-
-        // Outage insurance — the FULL agentic loop runs on Gemini's native
-        // function-calling (free tier): tools, missions, forms all keep working.
-        try {
-          const geminiTurn = await runGeminiAgentTurn({
-            system: systemPrompt,
-            messages,
-            tools,
-            toolCtx,
-            profileSnapshot: input.profileSnapshot,
-            emit: emit
-              ? (e) => emit({ event: e.event, data: e.data } as AgentEvent)
-              : undefined,
-            actionLabel: (t) => TOOL_ACTION_LABELS[t] ?? "Working",
-            describe: describeToolResult,
-          });
-          if (geminiTurn) {
-            return {
-              reply: geminiTurn.reply,
-              profileUpdates: profileUpdates ?? geminiTurn.profileUpdates,
-              filledFormData: filledFormData ?? geminiTurn.filledFormData,
-              nextAction: geminiTurn.nextAction ?? { type: "none" },
-              toolsUsed: [...new Set([...toolsUsed, ...geminiTurn.toolsUsed])],
-              model: geminiTurn.model,
-              plan: geminiTurn.plan ?? toolCtx.plan,
-            };
-          }
-        } catch (geminiErr) {
-          console.error("[agent-run] gemini agentic loop failed", geminiErr);
-        }
-
-        // Last resort — text-only Gemini reply, no tools.
-        const geminiReply = await geminiGenerate({
-          system: systemPrompt,
-          userParts: messages
-            .filter((m) => m.role === "user" || m.role === "assistant")
-            .map((m) => ({
-              type: "text" as const,
-              text: `${m.role === "user" ? "User" : "Assistant"}: ${
-                typeof m.content === "string" ? m.content : ""
-              }`,
-            })),
-          temperature: 0.4,
-        });
-        if (geminiReply) {
-          return {
-            reply: geminiReply,
-            profileUpdates,
-            filledFormData,
-            nextAction: nextAction ?? { type: "none" },
-            toolsUsed: [...new Set(toolsUsed)],
-            model: "gemini-3.5-flash",
-            plan: toolCtx.plan,
-          };
-        }
-
-        // Everything failed (balance gate + rate limits) — stay graceful and
-        // never leak raw provider errors to the voice UI.
-        return {
-          reply:
-            "I'm getting too many requests right now — everything is running on free tiers. Give me about thirty seconds, then try again.",
-          profileUpdates,
-          filledFormData,
-          nextAction: nextAction ?? { type: "none" },
-          toolsUsed: [...new Set(toolsUsed)],
-          model: "fallback",
-          plan: toolCtx.plan,
-        };
-      }
-
-      const data = (await res.json()) as {
-        choices?: Array<{
-          message?: {
-            content?: string | null;
-            tool_calls?: Array<{
-              id: string;
-              type: string;
-              function: { name: string; arguments: string };
-            }>;
-          };
-          finish_reason?: string;
-        }>;
-      };
-
-      const choice = data.choices?.[0];
-      const assistantMsg = choice?.message;
-
-      if (!assistantMsg) {
-        throw new Error("No response from model");
-      }
-
-      // If the model wants to call tools
-      if (assistantMsg.tool_calls?.length) {
-        // Add assistant message with tool calls to history
-        messages.push({
-          role: "assistant",
-          content: assistantMsg.content ?? "",
-          tool_calls: assistantMsg.tool_calls,
-        });
-
-        // Execute each tool and add results
-        for (const toolCall of assistantMsg.tool_calls) {
-          const toolName = toolCall.function.name;
-          toolsUsed.push(toolName);
-
-          let args: Record<string, unknown>;
-          try {
-            args = JSON.parse(toolCall.function.arguments);
-          } catch {
-            args = {};
-          }
-
-          const action = TOOL_ACTION_LABELS[toolName] ?? "Working";
-          emit?.({ event: "tool_start", data: { tool: toolName, action } });
-
-          const result = await executeTool(toolName, args, toolCtx);
-
-          emit?.({
-            event: "tool_end",
-            data: { tool: toolName, action, summary: describeToolResult(toolName, result) },
-          });
-
-          // Track profile updates
-          if (toolName === "update_user_profile" && result && typeof result === "object" && "fields" in result) {
-            profileUpdates = {
-              ...profileUpdates,
-              ...(result as { fields: Record<string, string> }).fields,
-            };
-          }
-
-          // Track filled form fields
-          if (toolName === "fill_form_fields" && result && typeof result === "object" && "filled" in result) {
-            filledFormData = (result as { filled: Record<string, string> }).filled;
-          }
-
-          // Track mission plan mutations
-          if ((toolName === "create_plan" || toolName === "update_plan") && result && typeof result === "object" && "plan" in result) {
-            toolCtx.plan = (result as { plan: MissionPlan }).plan;
-          }
-
-          // Track client actions
-          if (result && typeof result === "object" && "clientAction" in result) {
-            const action0 = result as Record<string, unknown>;
-            switch (action0.clientAction) {
-              case "open_camera":
-                nextAction = { type: "open_camera", purpose: action0.purpose };
-                break;
-              case "start_screen_share":
-                nextAction = { type: "start_screen_share" };
-                break;
-              case "navigate":
-                nextAction = { type: "navigate", url: action0.url };
-                break;
-              case "listen_voice":
-                nextAction = {
-                  type: "listen_voice",
-                  prompt: action0.prompt,
-                };
-                break;
-              case "download_form":
-                nextAction = {
-                  type: "download_form",
-                  formName: action0.formName,
-                  formNameHi: action0.formNameHi,
-                  downloadPath: action0.downloadPath,
-                };
-                break;
-            }
-          }
-
-          // Generate PDF server-side immediately and return as download
-          // When agent calls generate_filled_pdf, tell client to generate
-          // (client has the form image, we don't)
-          if (
-            toolName === "generate_filled_pdf" &&
-            result &&
-            typeof result === "object" &&
-            "action" in result
-          ) {
-            const pdfResult = result as Record<string, unknown>;
-            const agentFields = (pdfResult.filledFields ?? {}) as Record<string, string>;
-            // Merge profile + agent fields for maximum coverage
-            const mergedFields = { ...input.profileSnapshot, ...agentFields };
-            nextAction = {
-              type: "generate_pdf_client",
-              filledFields: mergedFields,
-            };
-          }
-
-          messages.push({
-            role: "tool",
-            tool_call_id: toolCall.id,
-            content: JSON.stringify(result),
-          });
-        }
-
-        // Continue the loop to let the model respond to tool results
-        continue;
-      }
-
-      // Model gave a final text response — we're done
-      const reply = assistantMsg.content?.trim() ?? "";
+    const geminiTurn = await runGeminiAgentTurn({
+      system: systemPrompt,
+      messages: loopMessages,
+      tools,
+      toolCtx,
+      profileSnapshot: input.profileSnapshot,
+      emit: emitBridge,
+      actionLabel: (t) => TOOL_ACTION_LABELS[t] ?? "Working",
+      describe: describeToolResult,
+    });
+    if (geminiTurn && geminiTurn.reply) {
       return {
-        reply,
-        profileUpdates,
-        filledFormData,
-        nextAction: nextAction ?? { type: "none" },
-        toolsUsed: [...new Set(toolsUsed)],
-        model,
-        plan: toolCtx.plan,
+        reply: geminiTurn.reply,
+        profileUpdates: geminiTurn.profileUpdates,
+        filledFormData: geminiTurn.filledFormData,
+        nextAction: geminiTurn.nextAction ?? { type: "none" },
+        toolsUsed: geminiTurn.toolsUsed,
+        model: geminiTurn.model,
+        plan: geminiTurn.plan ?? toolCtx.plan,
       };
     }
+  } catch (geminiErr) {
+    console.error("[agent-run] gemini agentic loop failed", geminiErr);
+  }
 
-    // Exceeded max iterations
+  // ── 4. Gemini text-only reply (no tools) ──
+  const geminiReply = await geminiGenerate({
+    system: systemPrompt,
+    userParts: loopMessages
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .map((m) => ({
+        type: "text" as const,
+        text: `${m.role === "user" ? "User" : "Assistant"}: ${
+          typeof m.content === "string" ? m.content : ""
+        }`,
+      })),
+    temperature: 0.4,
+  });
+  if (geminiReply) {
     return {
-      reply: "I'm having trouble processing that. Could you try again?",
-      profileUpdates,
-      nextAction: nextAction ?? { type: "none" },
-      toolsUsed: [...new Set(toolsUsed)],
-      model,
+      reply: geminiReply,
+      profileUpdates: undefined,
+      filledFormData: undefined,
+      nextAction: { type: "none" },
+      toolsUsed: [],
+      model: "gemini-text",
       plan: toolCtx.plan,
     };
-  } catch (err) {
-    console.error("[agent-run] error:", err);
-    throw err;
   }
+
+  // ── 5. Graceful — never leak provider errors to the voice UI ──
+  return {
+    reply:
+      "I'm getting too many requests right now — everything is running on free tiers. Give me about thirty seconds, then try again.",
+    profileUpdates: undefined,
+    filledFormData: undefined,
+    nextAction: { type: "none" },
+    toolsUsed: [],
+    model: "fallback",
+    plan: toolCtx.plan,
+  };
 }
