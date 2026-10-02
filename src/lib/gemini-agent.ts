@@ -183,24 +183,35 @@ export async function runGeminiAgentTurn(opts: {
     body: Record<string, unknown>,
   ): Promise<{ candidates?: Array<{ content?: { parts?: GeminiPart[] } }> } | null> {
     for (const model of MODELS) {
-      try {
-        const res = await fetch(
-          `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body),
-          },
-        );
-        if (res.ok) {
-          servedModel = model;
-          return (await res.json()) as {
-            candidates?: Array<{ content?: { parts?: GeminiPart[] } }>;
-          };
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          if (attempt > 0) {
+            await new Promise((r) => setTimeout(r, 2500));
+          }
+          const res = await fetch(
+            `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            },
+          );
+          if (res.ok) {
+            servedModel = model;
+            return (await res.json()) as {
+              candidates?: Array<{ content?: { parts?: GeminiPart[] } }>;
+            };
+          }
+          if (res.status === 429 && attempt === 0) {
+            console.error("[gemini-agent]", model, "429 — retrying after backoff");
+            continue;
+          }
+          console.error("[gemini-agent]", model, res.status, (await res.text()).slice(0, 200));
+          break;
+        } catch (err) {
+          console.error("[gemini-agent]", model, "failed", err);
+          break;
         }
-        console.error("[gemini-agent]", model, res.status, (await res.text()).slice(0, 200));
-      } catch (err) {
-        console.error("[gemini-agent]", model, "failed", err);
       }
     }
     return null;

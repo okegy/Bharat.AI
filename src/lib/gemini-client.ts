@@ -71,31 +71,42 @@ export async function geminiGenerate(opts: {
   }
 
   for (const model of models) {
-    try {
-      const res = await fetch(
-        `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        },
-      );
-      if (!res.ok) {
-        console.error("[gemini]", model, res.status, (await res.text()).slice(0, 300));
-        continue;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        if (attempt > 0) {
+          // 429s are per-minute quota windows — one short backoff usually clears
+          await new Promise((r) => setTimeout(r, 2500));
+        }
+        const res = await fetch(
+          `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          },
+        );
+        if (res.status === 429 && attempt === 0) {
+          console.error("[gemini]", model, "429 — retrying after backoff");
+          continue;
+        }
+        if (!res.ok) {
+          console.error("[gemini]", model, res.status, (await res.text()).slice(0, 300));
+          break;
+        }
+        const data = (await res.json()) as {
+          candidates?: Array<{
+            content?: { parts?: Array<{ text?: string }> };
+          }>;
+        };
+        const out = data.candidates?.[0]?.content?.parts
+          ?.map((p) => (typeof p.text === "string" ? p.text : ""))
+          .join("")
+          .trim();
+        if (out) return out;
+      } catch (err) {
+        console.error("[gemini]", model, "request failed", err);
+        break;
       }
-      const data = (await res.json()) as {
-        candidates?: Array<{
-          content?: { parts?: Array<{ text?: string }> };
-        }>;
-      };
-      const out = data.candidates?.[0]?.content?.parts
-        ?.map((p) => (typeof p.text === "string" ? p.text : ""))
-        .join("")
-        .trim();
-      if (out) return out;
-    } catch (err) {
-      console.error("[gemini]", model, "request failed", err);
     }
   }
   return null;

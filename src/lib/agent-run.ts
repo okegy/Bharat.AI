@@ -330,7 +330,18 @@ export async function runAgentTurn(
           };
         }
 
-        throw new Error(`Agent failed (${res.status}): ${errDetail}`);
+        // Everything failed (balance gate + rate limits) — stay graceful and
+        // never leak raw provider errors to the voice UI.
+        return {
+          reply:
+            "I'm getting too many requests right now — everything is running on free tiers. Give me about thirty seconds, then try again.",
+          profileUpdates,
+          filledFormData,
+          nextAction: nextAction ?? { type: "none" },
+          toolsUsed: [...new Set(toolsUsed)],
+          model: "fallback",
+          plan: toolCtx.plan,
+        };
       }
 
       const data = (await res.json()) as {
