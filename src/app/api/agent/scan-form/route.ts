@@ -4,6 +4,7 @@ import {
   getOpenRouterApiKey,
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
+import { geminiGenerate } from "@/lib/gemini-client";
 
 export async function POST(request: NextRequest) {
   const OPENROUTER_API_KEY = getOpenRouterApiKey();
@@ -27,6 +28,29 @@ export async function POST(request: NextRequest) {
   const model = getOpenRouterAgentModel();
 
   try {
+    // Gemini PRIMARY — free, strong Indic OCR, no balance gate.
+    try {
+      const geminiText = await geminiGenerate({
+        system: `You read Indian government form images. Detect the form's primary language and extract EVERY fillable field. Return a single JSON object: {"language": "<ISO 639-1 code>", "languageName": "<language name>", "fields": [{"label": "<label as printed>", "labelEnglish": "<English translation>", "value": "<pre-filled value or empty string>", "type": "text|checkbox|date|number|select", "required": true/false, "x": <0-100>, "y": <0-100>, "width": <0-100>, "height": <0-100>}]}. Coordinates are percentages of image dimensions. Output ONLY the JSON — no markdown fences, no commentary.`,
+        userParts: [{ type: "image", dataUrl: body.image }],
+        temperature: 0.1,
+        maxOutputTokens: 2000,
+      });
+      if (geminiText) {
+        try {
+          const cleaned = geminiText.match(/```(?:json)?\s*([\s\S]*?)```/);
+          const jsonStr = cleaned ? cleaned[1].trim() : geminiText;
+          const parsed = JSON.parse(jsonStr);
+          return NextResponse.json({ ...parsed, model: "gemini" });
+        } catch {
+          /* not valid JSON — fall through to OpenRouter */
+        }
+      }
+    } catch (e) {
+      console.error("[agent/scan-form] gemini primary failed", e);
+    }
+
+
     const res = await fetch(OPENROUTER_CHAT_URL, {
       method: "POST",
       headers: {

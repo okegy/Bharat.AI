@@ -6,6 +6,7 @@ import {
   getVoiceLangLabel,
   OPENROUTER_CHAT_URL,
 } from "@/lib/openrouter-config";
+import { geminiGenerate } from "@/lib/gemini-client";
 
 export async function POST(request: NextRequest) {
   const OPENROUTER_API_KEY = getOpenRouterApiKey();
@@ -50,6 +51,37 @@ export async function POST(request: NextRequest) {
     : "";
 
   try {
+    // Gemini PRIMARY — free, no balance gate.
+    try {
+      const geminiText = await geminiGenerate({
+        system: `You are a patient voice assistant guiding an Indian citizen through a government website. Respond in ${langLabel}. Analyze the screenshot and return JSON: {"instruction": "<spoken instruction in ${langLabel}>", "detectedFields": ["field1", "field2"], "nextAction": "<click/type/scroll suggestion>"}. Output ONLY the JSON.`,
+        userParts: [
+          { type: "text", text: `Guide the user to the next step.${profileContext}${prevContext}` },
+          { type: "image", dataUrl: body.screenshot },
+        ],
+        temperature: 0.3,
+        maxOutputTokens: 800,
+      });
+      if (geminiText) {
+        try {
+          const cleaned = geminiText.match(/```(?:json)?\s*([\s\S]*?)```/);
+          const jsonStr = cleaned ? cleaned[1].trim() : geminiText;
+          const parsed = JSON.parse(jsonStr);
+          return NextResponse.json({ ...parsed, model: "gemini" });
+        } catch {
+          if (geminiText.trim().length > 0) {
+            return NextResponse.json({
+              instruction: geminiText.trim(),
+              detectedFields: [],
+              model: "gemini",
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.error("[agent/screen-guide] gemini primary failed", e);
+    }
+
     const res = await fetch(OPENROUTER_CHAT_URL, {
       method: "POST",
       headers: {

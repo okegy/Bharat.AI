@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ProfileData } from "@/lib/profile-vault";
+import { geminiGenerate } from "@/lib/gemini-client";
 import {
   DEFAULT_OPENROUTER_VISION_MODEL,
   getOpenRouterApiKey,
@@ -22,6 +23,8 @@ const EXTRACT_KEYS: (keyof ProfileData)[] = [
 const SYSTEM = `You help users digitize their own Indian Aadhaar card for offline form filling.
 Read only text clearly visible on the card image. If the image is not an Aadhaar card or text is unreadable, return empty strings for all fields.
 Never guess or fabricate numbers. For Aadhaar number, only include digits you clearly see (often 12 digits, sometimes shown grouped); omit if uncertain.
+Transcribe names EXACTLY, character by character, as printed on the card. If any letter is unclear, return "" for that field — never guess, autocomplete, or "correct" a name. Do not swap fullName with fatherName.
+If the card shows a name in both a regional script and English, return the English (Latin) rendering. Do not merge both scripts into one field.
 Return strictly one JSON object with these string keys only: fullName, fatherName, dob, gender, aadhaarNumber, address, pincode, district, state.
 Use "" for missing fields. For dob prefer DD/MM/YYYY as printed. Normalize gender to common English labels (Male, Female, Other) when clear.`;
 
@@ -100,6 +103,29 @@ export async function POST(request: NextRequest) {
 
   const model = getOpenRouterVisionModel();
 
+  // ── Gemini PRIMARY — free vision, strong Indic OCR, no balance gate. ──
+  try {
+    const geminiText = await geminiGenerate({
+      system: SYSTEM,
+      userParts: [
+        { type: "text", text: USER_TEXT },
+        { type: "image", dataUrl: imageUrl },
+      ],
+      temperature: 0.1,
+      maxOutputTokens: 500,
+    });
+    if (geminiText) {
+      try {
+        const profile = coerceProfile(parseJsonFromContent(geminiText));
+        return NextResponse.json({ profile, modelUsed: "gemini" });
+      } catch {
+        // Not valid JSON — fall through to the OpenRouter path.
+      }
+    }
+  } catch (e) {
+    console.error("[openrouter/aadhaar-extract] gemini primary failed", e);
+  }
+
   const payloadBase = {
     model,
     temperature: 0.1,
@@ -128,7 +154,29 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         ...payloadBase,
-        response_format: { type: "json_object" },
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "aadhaar_extraction",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                fullName: { type: "string" },
+                fatherName: { type: "string" },
+                dob: { type: "string" },
+                gender: { type: "string" },
+                aadhaarNumber: { type: "string" },
+                address: { type: "string" },
+                pincode: { type: "string" },
+                district: { type: "string" },
+                state: { type: "string" }
+              },
+              required: ["fullName", "fatherName", "dob", "gender", "aadhaarNumber", "address", "pincode", "district", "state"],
+              additionalProperties: false
+            }
+          }
+        },
       }),
     });
 

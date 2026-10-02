@@ -46,7 +46,18 @@ export async function geminiGenerate(opts: {
 
   // gemini-3.5-flash — newest generation this key's project can generate with
   // (gemini-2.5-* is deprecated for new keys; -latest aliases hit 503 demand spikes)
-  const model = opts.model ?? (process.env.GEMINI_MODEL?.trim() || "gemini-3.5-flash");
+  const models = [
+    ...new Set(
+      [
+        opts.model ?? undefined,
+        process.env.GEMINI_MODEL?.trim() || undefined,
+        "gemini-3.5-flash",
+        "gemini-flash-latest",
+        "gemini-3.8-flash",
+        "gemini-flash-lite-latest",
+      ].filter((m): m is string => !!m),
+    ),
+  ];
   const body: Record<string, unknown> = {
     contents: [{ role: "user", parts: toGeminiParts(opts.userParts) }],
     generationConfig: {
@@ -59,31 +70,33 @@ export async function geminiGenerate(opts: {
     body.systemInstruction = { parts: [{ text: opts.system }] };
   }
 
-  try {
-    const res = await fetch(
-      `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      },
-    );
-    if (!res.ok) {
-      console.error("[gemini]", model, res.status, (await res.text()).slice(0, 300));
-      return null;
+  for (const model of models) {
+    try {
+      const res = await fetch(
+        `${GEMINI_BASE}/${model}:generateContent?key=${encodeURIComponent(key)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+      );
+      if (!res.ok) {
+        console.error("[gemini]", model, res.status, (await res.text()).slice(0, 300));
+        continue;
+      }
+      const data = (await res.json()) as {
+        candidates?: Array<{
+          content?: { parts?: Array<{ text?: string }> };
+        }>;
+      };
+      const out = data.candidates?.[0]?.content?.parts
+        ?.map((p) => (typeof p.text === "string" ? p.text : ""))
+        .join("")
+        .trim();
+      if (out) return out;
+    } catch (err) {
+      console.error("[gemini]", model, "request failed", err);
     }
-    const data = (await res.json()) as {
-      candidates?: Array<{
-        content?: { parts?: Array<{ text?: string }> };
-      }>;
-    };
-    const out = data.candidates?.[0]?.content?.parts
-      ?.map((p) => (typeof p.text === "string" ? p.text : ""))
-      .join("")
-      .trim();
-    return out || null;
-  } catch (err) {
-    console.error("[gemini] request failed", err);
-    return null;
   }
+  return null;
 }
